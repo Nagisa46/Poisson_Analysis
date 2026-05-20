@@ -1,0 +1,130 @@
+HuTao_Bet_Assistant_App_RoadMap
+Generated: 2026-03-20 10:00:59.538998
+
+=====================
+1. SUMMARY FEATURES
+=====================
+
+Core Tools:
+- Poisson Model (predict match probabilities)
+- Implied Probability Calculator (market probability)
+- Live Betting Assistant (tempo-based decision support)
+
+Key Capabilities:
+- Compare Model vs Market → find value bet
+- EV (Expected Value) calculation
+- Multi-league support
+- Mobile-first web app (GitHub Pages)
+
+Future Features:
+- Asian Handicap & Over/Under full logic
+- Auto bet suggestion engine
+- Odds format conversion (MY, HK, Decimal)
+- Live analysis mode
+- History logging & ROI tracking
+- AI-assisted analysis (via n8n integration)
+
+
+=====================
+2. ROADMAP
+=====================
+
+Phase 1 (Now - Testing Phase)
+- Use Poisson + personal analysis
+- Collect 50–100 bets
+- Log all bets manually
+- Identify initial edge
+
+Phase 2 (Refinement Phase)
+- Add Implied Probability tool
+- Compare Model vs Market
+- Classify leagues (tempo / style)
+- Improve accuracy and consistency
+
+Phase 3 (System Build Phase)
+- Combine all tools into one UI
+- Add EV-based recommendation
+- Build history tracking system
+- Create decision workflow
+
+Phase 4 (Pre-Release Phase)
+- Improve UI/UX
+- Add automation (Google Sheet / n8n)
+- Test with larger dataset (200+ bets)
+- Prepare for public usage
+
+Phase 5 (Monetization Phase)
+- Launch web app
+- Add premium features:
+  - AI insights
+  - Bet suggestions
+  - Advanced analytics
+- Subscription model
+
+Target Opportunity:
+- Major tournaments (e.g. World Cup 2026)
+
+
+=====================
+3. CURRENT PROS & CONS
+=====================
+
+Pros:
+- Real betting validation (not theory)
+- Multi-league exposure
+- Combination of model + human analysis
+- Already showing early profitability
+- Flexible tool structure
+
+Cons:
+- Small sample size (10 bets = high variance)
+- No centralized logging system yet
+- No league classification (important for edge)
+- MY odds not yet standardized to decimal in all cases
+- AH / O/U logic still simplified
+- No automated decision engine yet
+
+Risks:
+- Overfitting early success
+- Inconsistent decision criteria
+- Market adjustment over time
+
+
+=====================
+4. RECOMMENDATIONS
+=====================
+
+Data & Logging:
+- Track every bet (match, league, odds, model %, result, P/L)
+- Add "League Type" (High tempo / Low tempo / Chaos)
+
+Model Usage:
+- Always compare:
+  Model Probability vs Market Probability
+- Focus on value gap (not just prediction)
+
+Odds Handling:
+- Convert MY odds to Decimal before EV calculation
+
+Strategy:
+- Avoid forcing bets (SKIP is important)
+- Use Poisson as baseline, not final decision
+
+Product Direction:
+- Move from "calculator" → "decision engine"
+- Users want answers, not numbers
+
+Future Build:
+- Integrate:
+  Poisson + Implied + Live Assistant
+- Add auto-highlight value bets
+- Build simple dashboard UI
+
+Mindset:
+- Think like a system builder, not just bettor
+- Focus on long-term ROI, not short-term wins
+
+
+=====================
+END OF FILE
+=====================

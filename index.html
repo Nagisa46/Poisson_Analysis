@@ -1,190 +1,1448 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Poisson Pro</title>
-
+<title>HuTao Bet Assistant</title>
 <style>
+/* ===== RESET & BASE ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: Arial;
-  padding: 15px;
-  background: #111;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #0a0a0f;
+  color: #e0e0e0;
+  padding: 0 0 80px 0;
+  min-height: 100vh;
+}
+
+/* ===== NAV TABS ===== */
+.nav {
+  display: flex;
+  background: #111118;
+  border-bottom: 1px solid #222;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-btn {
+  flex: 1;
+  padding: 14px 8px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.nav-btn.active {
+  color: #00e676;
+  border-bottom-color: #00e676;
+}
+.nav-btn:hover { color: #ccc; }
+
+/* ===== LAYOUT ===== */
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+.page { display: none; }
+.page.active { display: block; }
+
+/* ===== TYPOGRAPHY ===== */
+h2 {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 16px;
   color: #fff;
 }
-
-h2 { text-align: center; }
-
-.container {
-  max-width: 400px;
-  margin: auto;
+.subtitle {
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+  margin-top: -12px;
+  margin-bottom: 16px;
 }
 
-input {
-  width: 45%;
-  padding: 10px;
-  margin: 5px;
-  border-radius: 8px;
-  border: none;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 10px;
-  background: #00c853;
-  color: white;
-  font-size: 16px;
-}
-
+/* ===== CARDS ===== */
 .card {
-  background: #1e1e1e;
-  padding: 12px;
-  margin-top: 12px;
-  border-radius: 10px;
+  background: #16161e;
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  border: 1px solid #222;
+}
+.card-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #888;
+  margin-bottom: 10px;
+  font-weight: 600;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+/* ===== FORM ELEMENTS ===== */
+.input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+input, select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #1e1e2a;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input:focus, select:focus {
+  border-color: #00e676;
+}
+input::placeholder { color: #555; }
+label {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+/* ===== SLIDER ===== */
+.slider-container {
+  display: flex;
+  align-items: center;
   gap: 10px;
 }
+.slider-container input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: #333;
+  border: none;
+  padding: 0;
+}
+.slider-container input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #00e676;
+  cursor: pointer;
+}
+.slider-val {
+  font-size: 13px;
+  color: #00e676;
+  min-width: 36px;
+  text-align: right;
+  font-weight: 600;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  width: 100%;
+  padding: 13px;
+  margin-top: 8px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn:hover { opacity: 0.85; }
+.btn-primary { background: #00c853; color: #fff; }
+.btn-secondary { background: #333; color: #ccc; }
+.btn-danger { background: #c62828; color: #fff; }
+.btn-log { background: #1565c0; color: #fff; margin-top: 8px; }
+.btn-skip { background: #ff6f00; color: #fff; margin-top: 8px; }
+.btn-sm {
+  width: auto;
+  padding: 6px 14px;
+  font-size: 12px;
+  margin: 0;
+  border-radius: 6px;
+}
+
+/* ===== RESULTS ===== */
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.result-item {
+  background: #1a1a24;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+}
+.result-item .label { font-size: 11px; color: #888; }
+.result-item .value { font-size: 18px; font-weight: 700; margin-top: 2px; }
+.result-item .sub { font-size: 11px; margin-top: 2px; }
 
 .green { color: #00e676; }
 .red { color: #ff5252; }
+.yellow { color: #ffd600; }
+.dim { color: #666; }
+
+/* ===== VALUE BADGE ===== */
+.value-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.value-badge.positive { background: #00e67622; color: #00e676; }
+.value-badge.negative { background: #ff525222; color: #ff5252; }
+
+/* ===== RECOMMENDATION BOX ===== */
+.reco-box {
+  padding: 14px;
+  border-radius: 10px;
+  margin-top: 10px;
+  text-align: center;
+}
+.reco-box.bet { background: #00c85320; border: 1px solid #00c853; }
+.reco-box.skip { background: #ff6f0020; border: 1px solid #ff6f00; }
+.reco-box .reco-title { font-size: 18px; font-weight: 800; }
+.reco-box .reco-detail { font-size: 13px; margin-top: 4px; color: #bbb; }
+
+/* ===== OVER/UNDER TABLE ===== */
+.ou-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.ou-table th, .ou-table td {
+  padding: 8px;
+  text-align: center;
+  font-size: 13px;
+  border-bottom: 1px solid #222;
+}
+.ou-table th { color: #888; font-size: 11px; text-transform: uppercase; }
+
+/* ===== HISTORY TABLE ===== */
+.history-item {
+  background: #16161e;
+  border: 1px solid #222;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.history-teams { font-weight: 700; font-size: 14px; }
+.history-date { font-size: 11px; color: #666; }
+.history-details { font-size: 12px; color: #999; line-height: 1.6; }
+.history-result {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.history-result.win { background: #00e67622; color: #00e676; }
+.history-result.loss { background: #ff525222; color: #ff5252; }
+.history-result.pending { background: #ffd60022; color: #ffd600; }
+.history-result.skip { background: #66666633; color: #999; }
+
+/* ===== STATS CARDS ===== */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.stat-card {
+  background: #16161e;
+  border: 1px solid #222;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+.stat-card .stat-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-card .stat-value { font-size: 20px; font-weight: 800; margin-top: 4px; }
+
+/* ===== CORRECTION INFO ===== */
+.info-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #1565c022;
+  color: #64b5f6;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: help;
+}
+
+/* ===== ERROR ===== */
+.error-msg {
+  background: #ff525220;
+  color: #ff8a80;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  display: none;
+}
+.error-msg.show { display: block; }
+
+/* ===== TOOLTIP ===== */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+.tooltip .tip-text {
+  visibility: hidden;
+  background: #222;
+  color: #ccc;
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 10;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.tooltip:hover .tip-text { visibility: visible; opacity: 1; }
+
+/* ===== CLV SECTION ===== */
+.clv-section { margin-top: 8px; }
+
+/* ===== FILTER BAR ===== */
+.filter-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.filter-chip {
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid #333;
+  background: none;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+}
+.filter-chip.active { border-color: #00e676; color: #00e676; }
+
+/* ===== PRESET BUTTONS ===== */
+.preset-row {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+.preset-btn {
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid #444;
+  background: #1a1a24;
+  color: #aaa;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.preset-btn:hover { border-color: #00e676; color: #00e676; }
+.preset-btn.active { border-color: #00e676; color: #00e676; background: #00e67615; }
+
+/* ===== AH TABLE ===== */
+.ah-table { width: 100%; border-collapse: collapse; }
+.ah-table th, .ah-table td {
+  padding: 7px 6px;
+  text-align: center;
+  font-size: 12px;
+  border-bottom: 1px solid #222;
+}
+.ah-table th { color: #888; font-size: 10px; text-transform: uppercase; }
+.ah-table tr:hover { background: #ffffff06; }
+
+/* ===== O/U ODDS INPUT ROW ===== */
+.ou-odds-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 1fr;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.ou-odds-row .ou-line-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ccc;
+  text-align: center;
+}
+.ou-odds-row input {
+  padding: 8px;
+  font-size: 13px;
+}
 </style>
 </head>
-
 <body>
 
+<!-- ===== NAVIGATION ===== -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPage('calc')">Calculator</button>
+  <button class="nav-btn" onclick="showPage('history')">History</button>
+  <button class="nav-btn" onclick="showPage('stats')">Stats</button>
+</nav>
+
+<!-- ========================================= -->
+<!-- PAGE 1: CALCULATOR                        -->
+<!-- ========================================= -->
+<div id="page-calc" class="page active">
 <div class="container">
 
-<h2>Poisson Pro</h2>
+  <h2>HuTao Bet Assistant</h2>
+  <p class="subtitle">Poisson + Dixon-Coles | Weighted Form | Kelly Sizing</p>
 
-<input id="hs" placeholder="Home Score">
-<input id="hl" placeholder="Home Loss"><br>
-<input id="as" placeholder="Away Score">
-<input id="al" placeholder="Away Loss">
+  <div id="errorBox" class="error-msg"></div>
 
-<div class="card">
-  <b>Optional Odds (Decimal)</b><br>
-  <input id="homeOdd" placeholder="Home">
-  <input id="drawOdd" placeholder="Draw">
-  <input id="awayOdd" placeholder="Away">
+  <!-- Match Info -->
+  <div class="card">
+    <div class="card-title">Match Info</div>
+    <div class="input-row">
+      <div style="flex:1">
+        <label>Home Team</label>
+        <input id="homeTeam" placeholder="e.g. Arsenal">
+      </div>
+      <div style="flex:1">
+        <label>Away Team</label>
+        <input id="awayTeam" placeholder="e.g. Chelsea">
+      </div>
+    </div>
+    <div class="input-row">
+      <div style="flex:1">
+        <label>League</label>
+        <select id="league">
+          <option value="">Select League</option>
+          <optgroup label="Europe - Top 5">
+            <option value="EPL">Premier League</option>
+            <option value="LaLiga">La Liga</option>
+            <option value="SerieA">Serie A</option>
+            <option value="Bundesliga">Bundesliga</option>
+            <option value="Ligue1">Ligue 1</option>
+          </optgroup>
+          <optgroup label="Europe - Other">
+            <option value="UCL">Champions League</option>
+            <option value="UEL">Europa League</option>
+            <option value="UECL">Conference League</option>
+            <option value="Eredivisie">Eredivisie</option>
+            <option value="PrimeiraLiga">Primeira Liga</option>
+          </optgroup>
+          <optgroup label="Asia">
+            <option value="JLeague">J-League</option>
+            <option value="KLeague">K-League</option>
+            <option value="CSL">Chinese Super League</option>
+            <option value="ThaiLeague">Thai League</option>
+            <option value="MLeague">Malaysia Super League</option>
+          </optgroup>
+          <optgroup label="Americas">
+            <option value="MLS">MLS</option>
+            <option value="Brasileirao">Brasileirão</option>
+            <option value="LigaMX">Liga MX</option>
+          </optgroup>
+          <optgroup label="International">
+            <option value="WC">World Cup</option>
+            <option value="EURO">Euro</option>
+            <option value="AFC">AFC Asian Cup</option>
+            <option value="INTL">Int'l Friendly</option>
+          </optgroup>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div style="flex:1">
+        <label>Date</label>
+        <input id="matchDate" type="date">
+      </div>
+    </div>
+  </div>
+
+  <!-- Season Average Stats -->
+  <div class="card">
+    <div class="card-title">Season Average (per game)</div>
+    <div class="input-row">
+      <div style="flex:1">
+        <label>Home Goals Scored</label>
+        <input id="hs" type="number" step="0.01" placeholder="1.65">
+      </div>
+      <div style="flex:1">
+        <label>Home Goals Conceded</label>
+        <input id="hl" type="number" step="0.01" placeholder="0.90">
+      </div>
+    </div>
+    <div class="input-row">
+      <div style="flex:1">
+        <label>Away Goals Scored</label>
+        <input id="as" type="number" step="0.01" placeholder="1.20">
+      </div>
+      <div style="flex:1">
+        <label>Away Goals Conceded</label>
+        <input id="al" type="number" step="0.01" placeholder="1.40">
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Form (Last 5) -->
+  <div class="card">
+    <div class="card-title">Recent Form — Last 5 Games (optional)
+      <span class="tooltip">&#9432;
+        <span class="tip-text">If provided, lambda is blended between season avg and recent form using the weight slider below.</span>
+      </span>
+    </div>
+    <div class="input-row">
+      <div style="flex:1">
+        <label>Home Scored (L5)</label>
+        <input id="hs5" type="number" step="0.01" placeholder="2.00">
+      </div>
+      <div style="flex:1">
+        <label>Home Conceded (L5)</label>
+        <input id="hl5" type="number" step="0.01" placeholder="0.60">
+      </div>
+    </div>
+    <div class="input-row">
+      <div style="flex:1">
+        <label>Away Scored (L5)</label>
+        <input id="as5" type="number" step="0.01" placeholder="1.40">
+      </div>
+      <div style="flex:1">
+        <label>Away Conceded (L5)</label>
+        <input id="al5" type="number" step="0.01" placeholder="1.80">
+      </div>
+    </div>
+    <div style="margin-top: 8px;">
+      <label>Recent Form Weight: <span id="weightLabel">40%</span></label>
+      <div class="slider-container">
+        <span style="font-size:11px;color:#666">Season</span>
+        <input type="range" id="formWeight" min="0" max="100" value="40" oninput="setWeight(this.value)">
+        <span style="font-size:11px;color:#666">Recent</span>
+      </div>
+      <div class="preset-row">
+        <button class="preset-btn" onclick="setWeight(0)">0% Season Only</button>
+        <button class="preset-btn" onclick="setWeight(30)">30%</button>
+        <button class="preset-btn active" onclick="setWeight(40)">40% Default</button>
+        <button class="preset-btn" onclick="setWeight(60)">60%</button>
+        <button class="preset-btn" onclick="setWeight(100)">100% Recent Only</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Odds -->
+  <div class="card">
+    <div class="card-title">Market Odds (Decimal)</div>
+    <div class="input-row">
+      <div style="flex:1">
+        <label>Home Win</label>
+        <input id="homeOdd" type="number" step="0.01" placeholder="2.10">
+      </div>
+      <div style="flex:1">
+        <label>Draw</label>
+        <input id="drawOdd" type="number" step="0.01" placeholder="3.40">
+      </div>
+      <div style="flex:1">
+        <label>Away Win</label>
+        <input id="awayOdd" type="number" step="0.01" placeholder="3.50">
+      </div>
+    </div>
+  </div>
+
+  <!-- Asian Handicap Odds -->
+  <div class="card">
+    <div class="card-title">Asian Handicap Odds (optional)
+      <span class="tooltip">&#9432;
+        <span class="tip-text">Enter the AH line and odds. The model calculates probabilities from the score matrix. Positive line = underdog gets goals, Negative = favorite gives goals.</span>
+      </span>
+    </div>
+    <div class="input-row">
+      <div style="flex:1">
+        <label>AH Line (Home perspective)</label>
+        <select id="ahLine">
+          <option value="">Select Line</option>
+          <option value="-2.5">-2.5</option>
+          <option value="-2">-2.0</option>
+          <option value="-1.5">-1.5</option>
+          <option value="-1">-1.0</option>
+          <option value="-0.75">-0.75</option>
+          <option value="-0.5">-0.5</option>
+          <option value="-0.25">-0.25</option>
+          <option value="0">0 (DNB)</option>
+          <option value="0.25">+0.25</option>
+          <option value="0.5">+0.5</option>
+          <option value="0.75">+0.75</option>
+          <option value="1">+1.0</option>
+          <option value="1.5">+1.5</option>
+          <option value="2">+2.0</option>
+          <option value="2.5">+2.5</option>
+        </select>
+      </div>
+    </div>
+    <div class="input-row">
+      <div style="flex:1">
+        <label>Home AH Odd</label>
+        <input id="ahHomeOdd" type="number" step="0.01" placeholder="1.90">
+      </div>
+      <div style="flex:1">
+        <label>Away AH Odd</label>
+        <input id="ahAwayOdd" type="number" step="0.01" placeholder="2.00">
+      </div>
+    </div>
+  </div>
+
+  <!-- Over/Under Odds -->
+  <div class="card">
+    <div class="card-title">Over/Under Odds (optional)
+      <span class="tooltip">&#9432;
+        <span class="tip-text">Enter market odds for O/U lines to see EV and value comparison. Leave blank for lines you don't need.</span>
+      </span>
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label" style="font-size:11px;color:#888;">Line</span>
+      <span style="font-size:11px;color:#888;text-align:center;">Over Odd</span>
+      <span style="font-size:11px;color:#888;text-align:center;">Under Odd</span>
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 0.5</span>
+      <input id="over05Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under05Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 1.5</span>
+      <input id="over15Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under15Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 2.5</span>
+      <input id="over25Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under25Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 3.5</span>
+      <input id="over35Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under35Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 4.5</span>
+      <input id="over45Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under45Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+  </div>
+
+  <!-- Bankroll for Kelly -->
+  <div class="card">
+    <div class="card-title">Bankroll (for Kelly Sizing)</div>
+    <div class="input-row">
+      <div style="flex:1">
+        <label>Current Bankroll</label>
+        <input id="bankroll" type="number" step="1" placeholder="1000">
+      </div>
+      <div style="flex:1">
+        <label>Kelly Fraction</label>
+        <select id="kellyFrac">
+          <option value="0.25">Quarter Kelly (Safe)</option>
+          <option value="0.5">Half Kelly</option>
+          <option value="1">Full Kelly (Aggressive)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dixon-Coles Rho -->
+  <div class="card">
+    <div class="card-title">Dixon-Coles Correction
+      <span class="tooltip">&#9432;
+        <span class="tip-text">Rho (ρ) corrects for the correlation between low-scoring outcomes. Typical range: -0.13 to -0.05. Default -0.10 works well for most leagues.</span>
+      </span>
+    </div>
+    <div class="slider-container">
+      <span style="font-size:11px;color:#666">Weak</span>
+      <input type="range" id="rhoSlider" min="-20" max="0" value="-10" oninput="setRho(this.value)">
+      <span style="font-size:11px;color:#666">Strong</span>
+      <span class="slider-val" id="rhoLabel">-0.10</span>
+    </div>
+    <div class="preset-row">
+      <button class="preset-btn" onclick="setRho(0)">0 (Off)</button>
+      <button class="preset-btn" onclick="setRho(-5)">-0.05 Weak</button>
+      <button class="preset-btn active" onclick="setRho(-10)">-0.10 Default</button>
+      <button class="preset-btn" onclick="setRho(-13)">-0.13 Strong</button>
+      <button class="preset-btn" onclick="setRho(-18)">-0.18 Max</button>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" onclick="calculate()">Calculate</button>
+
+  <!-- Results -->
+  <div id="resultSection" style="display:none;">
+
+    <div id="recoBox"></div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="card-title">1X2 Probabilities & EV</div>
+      <div id="resultMain" class="result-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Model vs Market
+        <span class="info-badge">Dixon-Coles Applied</span>
+      </div>
+      <div id="resultComparison"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Asian Handicap</div>
+      <div id="ahResult"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Over / Under</div>
+      <table class="ou-table" id="ouTable"></table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Kelly Criterion — Stake Recommendation</div>
+      <div id="kellyResult"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Score Matrix (Top Probabilities)</div>
+      <div id="scoreMatrix"></div>
+    </div>
+
+    <!-- Log / Skip -->
+    <button class="btn btn-log" onclick="logBet('bet')">Log This Bet</button>
+    <button class="btn btn-skip" onclick="logBet('skip')">SKIP — No Value</button>
+  </div>
+
+</div>
 </div>
 
-<button onclick="calc()">Calculate</button>
+<!-- ========================================= -->
+<!-- PAGE 2: HISTORY                           -->
+<!-- ========================================= -->
+<div id="page-history" class="page">
+<div class="container">
+  <h2>Bet History</h2>
 
-<div id="result"></div>
+  <div class="filter-bar">
+    <button class="filter-chip active" onclick="filterHistory('all', this)">All</button>
+    <button class="filter-chip" onclick="filterHistory('pending', this)">Pending</button>
+    <button class="filter-chip" onclick="filterHistory('win', this)">Won</button>
+    <button class="filter-chip" onclick="filterHistory('loss', this)">Lost</button>
+    <button class="filter-chip" onclick="filterHistory('skip', this)">Skipped</button>
+  </div>
 
+  <div id="historyList"></div>
+
+  <button class="btn btn-danger" onclick="clearHistory()" style="margin-top:16px;">Clear All History</button>
+</div>
 </div>
 
+<!-- ========================================= -->
+<!-- PAGE 3: STATS                             -->
+<!-- ========================================= -->
+<div id="page-stats" class="page">
+<div class="container">
+  <h2>Performance Stats</h2>
+
+  <div id="overallStats"></div>
+  <div id="clvStats" class="card" style="margin-top:12px;"></div>
+  <div id="leagueBreakdown" class="card" style="margin-top:12px;"></div>
+</div>
+</div>
+
+<!-- ========================================= -->
+<!-- JAVASCRIPT                                -->
+<!-- ========================================= -->
 <script>
-function poisson(lambda, x) {
-  return (Math.pow(lambda, x) * Math.exp(-lambda)) / factorial(x);
-}
+// ===== UTILITY =====
+function $(id) { return document.getElementById(id); }
+function val(id) { const v = parseFloat($(id).value); return isNaN(v) ? null : v; }
 
 function factorial(n) {
-  if (n === 0) return 1;
-  return n * factorial(n - 1);
+  let r = 1;
+  for (let i = 2; i <= n; i++) r *= i;
+  return r;
 }
 
-function calc() {
+function poisson(lambda, k) {
+  return (Math.pow(lambda, k) * Math.exp(-lambda)) / factorial(k);
+}
 
-  let hs = parseFloat(hsEl.value);
-  let hl = parseFloat(hlEl.value);
-  let as = parseFloat(asEl.value);
-  let al = parseFloat(alEl.value);
+// ===== DIXON-COLES CORRECTION =====
+function dixonColesCorrection(x, y, lambdaH, lambdaA, rho) {
+  if (x === 0 && y === 0) return 1 - lambdaH * lambdaA * rho;
+  if (x === 1 && y === 0) return 1 + lambdaA * rho;
+  if (x === 0 && y === 1) return 1 + lambdaH * rho;
+  if (x === 1 && y === 1) return 1 - rho;
+  return 1;
+}
 
-  let homeLambda = (hs + al) / 2;
-  let awayLambda = (as + hl) / 2;
+// ===== PRESET HELPERS =====
+function setWeight(v) {
+  $('formWeight').value = v;
+  $('weightLabel').textContent = v + '%';
+  // highlight active preset
+  const row = $('formWeight').closest('.card').querySelectorAll('.preset-btn');
+  row.forEach(b => {
+    const match = b.textContent.match(/(\d+)%/);
+    b.classList.toggle('active', match && parseInt(match[1]) === parseInt(v));
+  });
+}
 
-  let maxGoals = 10;
+function setRho(v) {
+  $('rhoSlider').value = v;
+  $('rhoLabel').textContent = (v / 100).toFixed(2);
+  const row = $('rhoSlider').closest('.card').querySelectorAll('.preset-btn');
+  row.forEach(b => {
+    const match = b.textContent.match(/-?[\d.]+/);
+    if (match) {
+      const btnVal = Math.round(parseFloat(match[0]) * 100);
+      b.classList.toggle('active', btnVal === parseInt(v));
+    } else if (b.textContent.includes('Off')) {
+      b.classList.toggle('active', parseInt(v) === 0);
+    }
+  });
+}
 
+// ===== ASIAN HANDICAP PROBABILITY =====
+function calcAHProb(scoreProbs, totalProb, line) {
+  // line from HOME perspective: -1.5 means home gives 1.5 goals
+  // Home wins AH if (homeGoals - awayGoals + line) > 0
+  // For quarter lines (0.25, 0.75 etc), split into two bets
+  const isQuarter = (Math.abs(line * 4) % 2) === 1; // .25 or .75
+
+  if (isQuarter) {
+    // Split into two half-bets on adjacent half-lines
+    const line1 = line > 0 ? Math.floor(line * 2) / 2 : Math.ceil(line * 2) / 2;
+    const line2 = line > 0 ? Math.ceil(line * 2) / 2 : Math.floor(line * 2) / 2;
+    const p1 = calcAHProbSingle(scoreProbs, totalProb, line1);
+    const p2 = calcAHProbSingle(scoreProbs, totalProb, line2);
+    return {
+      homeWin: (p1.homeWin + p2.homeWin) / 2,
+      push: (p1.push + p2.push) / 2,
+      awayWin: (p1.awayWin + p2.awayWin) / 2
+    };
+  }
+  return calcAHProbSingle(scoreProbs, totalProb, line);
+}
+
+function calcAHProbSingle(scoreProbs, totalProb, line) {
+  let homeWin = 0, push = 0, awayWin = 0;
+  for (const s of scoreProbs) {
+    const diff = s.h - s.a + line;
+    const pNorm = s.p / totalProb;
+    if (diff > 0) homeWin += pNorm;
+    else if (diff === 0) push += pNorm;
+    else awayWin += pNorm;
+  }
+  return { homeWin, push, awayWin };
+}
+
+// ===== NAVIGATION =====
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  $('page-' + page).classList.add('active');
+  event.target.classList.add('active');
+
+  if (page === 'history') renderHistory();
+  if (page === 'stats') renderStats();
+}
+
+// ===== VALIDATION =====
+function validate() {
+  const required = [
+    { id: 'hs', name: 'Home Goals Scored' },
+    { id: 'hl', name: 'Home Goals Conceded' },
+    { id: 'as', name: 'Away Goals Scored' },
+    { id: 'al', name: 'Away Goals Conceded' }
+  ];
+  const errors = [];
+
+  for (const f of required) {
+    const v = val(f.id);
+    if (v === null || v < 0) errors.push(f.name + ' is required (≥ 0)');
+  }
+
+  // Check recent form: all or none
+  const recentFields = ['hs5', 'hl5', 'as5', 'al5'];
+  const recentVals = recentFields.map(id => val(id));
+  const hasAny = recentVals.some(v => v !== null);
+  const hasAll = recentVals.every(v => v !== null && v >= 0);
+  if (hasAny && !hasAll) errors.push('Fill all 4 recent form fields, or leave all empty');
+
+  // Odds: all or none
+  const oddsFields = ['homeOdd', 'drawOdd', 'awayOdd'];
+  const oddsVals = oddsFields.map(id => val(id));
+  const hasAnyOdds = oddsVals.some(v => v !== null);
+  const hasAllOdds = oddsVals.every(v => v !== null && v > 1);
+  if (hasAnyOdds && !hasAllOdds) errors.push('Fill all 3 odds (must be > 1.00), or leave all empty');
+
+  if (errors.length) {
+    $('errorBox').innerHTML = errors.join('<br>');
+    $('errorBox').classList.add('show');
+    return false;
+  }
+  $('errorBox').classList.remove('show');
+  return true;
+}
+
+// ===== MAIN CALCULATION =====
+let lastCalcResult = null;
+
+function calculate() {
+  if (!validate()) return;
+
+  const hs = val('hs'), hl = val('hl'), as = val('as'), al = val('al');
+  const hs5 = val('hs5'), hl5 = val('hl5'), as5 = val('as5'), al5 = val('al5');
+  const w = parseInt($('formWeight').value) / 100;
+  const rho = parseInt($('rhoSlider').value) / 100;
+
+  // Lambda calculation (weighted if recent form provided)
+  let homeLambda, awayLambda;
+  if (hs5 !== null && hl5 !== null && as5 !== null && al5 !== null) {
+    const seasonHomeL = (hs + al) / 2;
+    const seasonAwayL = (as + hl) / 2;
+    const recentHomeL = (hs5 + al5) / 2;
+    const recentAwayL = (as5 + hl5) / 2;
+    homeLambda = seasonHomeL * (1 - w) + recentHomeL * w;
+    awayLambda = seasonAwayL * (1 - w) + recentAwayL * w;
+  } else {
+    homeLambda = (hs + al) / 2;
+    awayLambda = (as + hl) / 2;
+  }
+
+  const maxGoals = 8;
   let homeWin = 0, draw = 0, awayWin = 0;
-  let over15 = 0, over25 = 0, over35 = 0, over45 = 0;
+  let over05 = 0, over15 = 0, over25 = 0, over35 = 0, over45 = 0;
+  let btts = 0;
+  const scoreProbs = [];
 
   for (let i = 0; i <= maxGoals; i++) {
     for (let j = 0; j <= maxGoals; j++) {
-
       let p = poisson(homeLambda, i) * poisson(awayLambda, j);
+      // Dixon-Coles correction for low scores
+      p *= dixonColesCorrection(i, j, homeLambda, awayLambda, rho);
+      p = Math.max(p, 0); // ensure non-negative
 
       if (i > j) homeWin += p;
       else if (i === j) draw += p;
       else awayWin += p;
 
-      let total = i + j;
+      const total = i + j;
+      if (total > 0.5) over05 += p;
       if (total > 1.5) over15 += p;
       if (total > 2.5) over25 += p;
       if (total > 3.5) over35 += p;
       if (total > 4.5) over45 += p;
+      if (i > 0 && j > 0) btts += p;
+
+      scoreProbs.push({ h: i, a: j, p: p });
     }
   }
 
-  // normalize ให้รวม = 100%
-  let totalProb = homeWin + draw + awayWin;
+  // Normalize
+  const totalProb = homeWin + draw + awayWin;
   homeWin /= totalProb;
   draw /= totalProb;
   awayWin /= totalProb;
 
-  // EV calc
-  function ev(prob, odd) {
+  // Normalize O/U and BTTS too
+  over05 /= totalProb; over15 /= totalProb; over25 /= totalProb;
+  over35 /= totalProb; over45 /= totalProb;
+  btts /= totalProb;
+
+  // Odds & EV & Kelly
+  const homeOdd = val('homeOdd'), drawOdd = val('drawOdd'), awayOdd = val('awayOdd');
+  const bankroll = val('bankroll') || 0;
+  const kellyFrac = parseFloat($('kellyFrac').value);
+  const hasOdds = homeOdd && drawOdd && awayOdd;
+
+  function calcEV(prob, odd) {
     if (!odd) return null;
     return (prob * odd) - 1;
   }
 
-  let homeOdd = parseFloat(homeOddEl.value);
-  let drawOdd = parseFloat(drawOddEl.value);
-  let awayOdd = parseFloat(awayOddEl.value);
-
-  let homeEV = ev(homeWin, homeOdd);
-  let drawEV = ev(draw, drawOdd);
-  let awayEV = ev(awayWin, awayOdd);
-
-  function colorEV(v) {
-    if (v == null) return "";
-    return v > 0 ? "green" : "red";
+  function calcImplied(odd) {
+    if (!odd) return null;
+    return 1 / odd;
   }
 
-  result.innerHTML = `
-    <div class="card">
-      <b>Result</b><br>
-      Home Win: ${(homeWin*100).toFixed(1)}% 
-      ${homeEV ? `<span class="${colorEV(homeEV)}">EV: ${homeEV.toFixed(2)}</span>` : ""}<br>
-      Draw: ${(draw*100).toFixed(1)}% 
-      ${drawEV ? `<span class="${colorEV(drawEV)}">EV: ${drawEV.toFixed(2)}</span>` : ""}<br>
-      Away Win: ${(awayWin*100).toFixed(1)}% 
-      ${awayEV ? `<span class="${colorEV(awayEV)}">EV: ${awayEV.toFixed(2)}</span>` : ""}
+  function calcKelly(prob, odd, frac) {
+    if (!odd || !bankroll) return null;
+    const b = odd - 1;
+    const q = 1 - prob;
+    const k = ((b * prob) - q) / b;
+    if (k <= 0) return { pct: 0, amount: 0 };
+    const adjK = k * frac;
+    return { pct: adjK, amount: adjK * bankroll };
+  }
+
+  const homeEV = calcEV(homeWin, homeOdd);
+  const drawEV = calcEV(draw, drawOdd);
+  const awayEV = calcEV(awayWin, awayOdd);
+
+  const homeImpl = calcImplied(homeOdd);
+  const drawImpl = calcImplied(drawOdd);
+  const awayImpl = calcImplied(awayOdd);
+
+  const homeKelly = calcKelly(homeWin, homeOdd, kellyFrac);
+  const drawKelly = calcKelly(draw, drawOdd, kellyFrac);
+  const awayKelly = calcKelly(awayWin, awayOdd, kellyFrac);
+
+  // ===== ASIAN HANDICAP =====
+  const ahLine = val('ahLine');
+  const ahHomeOdd = val('ahHomeOdd');
+  const ahAwayOdd = val('ahAwayOdd');
+  let ahData = null;
+
+  if (ahLine !== null) {
+    const ahProb = calcAHProb(scoreProbs, totalProb, ahLine);
+    // For AH, effective prob considers push as half-win/half-loss
+    const homeEffective = ahProb.homeWin + ahProb.push * 0.5;
+    const awayEffective = ahProb.awayWin + ahProb.push * 0.5;
+    ahData = {
+      line: ahLine,
+      homeWin: ahProb.homeWin,
+      push: ahProb.push,
+      awayWin: ahProb.awayWin,
+      homeEffective,
+      awayEffective,
+      homeOdd: ahHomeOdd,
+      awayOdd: ahAwayOdd,
+      homeEV: ahHomeOdd ? (homeEffective * ahHomeOdd - 1) : null,
+      awayEV: ahAwayOdd ? (awayEffective * ahAwayOdd - 1) : null,
+      homeImplied: ahHomeOdd ? 1 / ahHomeOdd : null,
+      awayImplied: ahAwayOdd ? 1 / ahAwayOdd : null
+    };
+  }
+
+  // ===== OVER/UNDER WITH ODDS =====
+  const ouLines = [
+    { line: '0.5', prob: over05 },
+    { line: '1.5', prob: over15 },
+    { line: '2.5', prob: over25 },
+    { line: '3.5', prob: over35 },
+    { line: '4.5', prob: over45 }
+  ];
+
+  const ouData = ouLines.map(ou => {
+    const overOdd = val('over' + ou.line.replace('.', '') + 'Odd');
+    const underOdd = val('under' + ou.line.replace('.', '') + 'Odd');
+    const overProb = ou.prob;
+    const underProb = 1 - ou.prob;
+    return {
+      line: ou.line,
+      overProb,
+      underProb,
+      overOdd,
+      underOdd,
+      overEV: overOdd ? (overProb * overOdd - 1) : null,
+      underEV: underOdd ? (underProb * underOdd - 1) : null,
+      overImplied: overOdd ? 1 / overOdd : null,
+      underImplied: underOdd ? 1 / underOdd : null
+    };
+  });
+
+  // Store result for logging
+  lastCalcResult = {
+    homeTeam: $('homeTeam').value || 'Home',
+    awayTeam: $('awayTeam').value || 'Away',
+    league: $('league').value || 'N/A',
+    date: $('matchDate').value || new Date().toISOString().slice(0, 10),
+    homeLambda, awayLambda, rho,
+    homeWin, draw, awayWin,
+    over05, over15, over25, over35, over45, btts,
+    homeOdd, drawOdd, awayOdd,
+    homeEV, drawEV, awayEV,
+    homeImpl, drawImpl, awayImpl,
+    homeKelly, drawKelly, awayKelly,
+    ahData, ouData,
+    weighted: hs5 !== null,
+    formWeight: w
+  };
+
+  // ===== RENDER RESULTS =====
+  $('resultSection').style.display = 'block';
+
+  // Recommendation
+  let bestBet = null, bestEV = 0;
+  if (hasOdds) {
+    if (homeEV > bestEV) { bestEV = homeEV; bestBet = { label: 'Home Win', ev: homeEV, kelly: homeKelly, odd: homeOdd, prob: homeWin }; }
+    if (drawEV > bestEV) { bestEV = drawEV; bestBet = { label: 'Draw', ev: drawEV, kelly: drawKelly, odd: drawOdd, prob: draw }; }
+    if (awayEV > bestEV) { bestEV = awayEV; bestBet = { label: 'Away Win', ev: awayEV, kelly: awayKelly, odd: awayOdd, prob: awayWin }; }
+  }
+
+  if (bestBet) {
+    $('recoBox').innerHTML = `
+      <div class="reco-box bet">
+        <div class="reco-title green">VALUE: ${bestBet.label}</div>
+        <div class="reco-detail">
+          EV: +${(bestBet.ev * 100).toFixed(1)}% | Model: ${(bestBet.prob * 100).toFixed(1)}% vs Market: ${(calcImplied(bestBet.odd) * 100).toFixed(1)}%
+          ${bestBet.kelly && bestBet.kelly.pct > 0 ? ` | Kelly: ${(bestBet.kelly.pct * 100).toFixed(1)}%` : ''}
+        </div>
+      </div>
+    `;
+  } else if (hasOdds) {
+    $('recoBox').innerHTML = `
+      <div class="reco-box skip">
+        <div class="reco-title yellow">NO VALUE FOUND</div>
+        <div class="reco-detail">All outcomes have negative EV. Consider SKIP.</div>
+      </div>
+    `;
+  } else {
+    $('recoBox').innerHTML = '';
+  }
+
+  // 1X2 Results
+  function evBadge(ev) {
+    if (ev === null) return '';
+    const cls = ev > 0 ? 'positive' : 'negative';
+    return `<span class="value-badge ${cls}">EV ${ev > 0 ? '+' : ''}${(ev * 100).toFixed(1)}%</span>`;
+  }
+
+  $('resultMain').innerHTML = `
+    <div class="result-item">
+      <div class="label">Home Win</div>
+      <div class="value">${(homeWin * 100).toFixed(1)}%</div>
+      <div class="sub">${evBadge(homeEV)}</div>
     </div>
-
-    <div class="card grid">
-      <div>Over 1.5: ${(over15*100).toFixed(1)}%</div>
-      <div>Under 1.5: ${(100-over15*100).toFixed(1)}%</div>
-
-      <div>Over 2.5: ${(over25*100).toFixed(1)}%</div>
-      <div>Under 2.5: ${(100-over25*100).toFixed(1)}%</div>
-
-      <div>Over 3.5: ${(over35*100).toFixed(1)}%</div>
-      <div>Under 3.5: ${(100-over35*100).toFixed(1)}%</div>
-
-      <div>Over 4.5: ${(over45*100).toFixed(1)}%</div>
-      <div>Under 4.5: ${(100-over45*100).toFixed(1)}%</div>
+    <div class="result-item">
+      <div class="label">Draw</div>
+      <div class="value">${(draw * 100).toFixed(1)}%</div>
+      <div class="sub">${evBadge(drawEV)}</div>
+    </div>
+    <div class="result-item">
+      <div class="label">Away Win</div>
+      <div class="value">${(awayWin * 100).toFixed(1)}%</div>
+      <div class="sub">${evBadge(awayEV)}</div>
+    </div>
+    <div class="result-item">
+      <div class="label">BTTS</div>
+      <div class="value">${(btts * 100).toFixed(1)}%</div>
+      <div class="sub dim">Yes</div>
     </div>
   `;
+
+  // Model vs Market Comparison
+  if (hasOdds) {
+    function compRow(label, model, implied) {
+      const gap = ((model - implied) * 100).toFixed(1);
+      const gapCls = gap > 0 ? 'green' : (gap < -3 ? 'red' : 'dim');
+      const arrow = gap > 0 ? '&#9650;' : (gap < 0 ? '&#9660;' : '—');
+      return `
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222;font-size:13px;">
+          <span>${label}</span>
+          <span>Model: <b>${(model * 100).toFixed(1)}%</b></span>
+          <span>Market: <b>${(implied * 100).toFixed(1)}%</b></span>
+          <span class="${gapCls}">${arrow} ${gap > 0 ? '+' : ''}${gap}%</span>
+        </div>`;
+    }
+    $('resultComparison').innerHTML =
+      compRow('Home', homeWin, homeImpl) +
+      compRow('Draw', draw, drawImpl) +
+      compRow('Away', awayWin, awayImpl);
+  } else {
+    $('resultComparison').innerHTML = '<div style="color:#666;font-size:13px;">Enter odds to see Model vs Market comparison</div>';
+  }
+
+  // AH Result
+  if (ahData) {
+    const lineStr = ahData.line >= 0 ? '+' + ahData.line : '' + ahData.line;
+    $('ahResult').innerHTML = `
+      <table class="ah-table">
+        <tr><th>AH Line</th><th>Home ${lineStr}</th><th>Push</th><th>Away ${ahData.line >= 0 ? '' : '+'}${-ahData.line}</th></tr>
+        <tr>
+          <td style="font-weight:600;">Probability</td>
+          <td>${(ahData.homeWin * 100).toFixed(1)}%</td>
+          <td>${(ahData.push * 100).toFixed(1)}%</td>
+          <td>${(ahData.awayWin * 100).toFixed(1)}%</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">Effective</td>
+          <td>${(ahData.homeEffective * 100).toFixed(1)}%</td>
+          <td class="dim">—</td>
+          <td>${(ahData.awayEffective * 100).toFixed(1)}%</td>
+        </tr>
+        ${ahData.homeOdd || ahData.awayOdd ? `
+        <tr>
+          <td style="font-weight:600;">Market Implied</td>
+          <td>${ahData.homeImplied ? (ahData.homeImplied * 100).toFixed(1) + '%' : '—'}</td>
+          <td class="dim">—</td>
+          <td>${ahData.awayImplied ? (ahData.awayImplied * 100).toFixed(1) + '%' : '—'}</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">EV</td>
+          <td>${ahData.homeEV !== null ? `<span class="${ahData.homeEV > 0 ? 'green' : 'red'}">${(ahData.homeEV * 100).toFixed(1)}%</span>` : '—'}</td>
+          <td class="dim">—</td>
+          <td>${ahData.awayEV !== null ? `<span class="${ahData.awayEV > 0 ? 'green' : 'red'}">${(ahData.awayEV * 100).toFixed(1)}%</span>` : '—'}</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">Value Gap</td>
+          <td>${ahData.homeImplied ? `<span class="${ahData.homeEffective > ahData.homeImplied ? 'green' : 'red'}">${((ahData.homeEffective - ahData.homeImplied) * 100).toFixed(1)}%</span>` : '—'}</td>
+          <td class="dim">—</td>
+          <td>${ahData.awayImplied ? `<span class="${ahData.awayEffective > ahData.awayImplied ? 'green' : 'red'}">${((ahData.awayEffective - ahData.awayImplied) * 100).toFixed(1)}%</span>` : '—'}</td>
+        </tr>
+        ` : ''}
+      </table>
+      ${ahData.homeEV > 0 || ahData.awayEV > 0 ? `
+        <div class="reco-box bet" style="margin-top:8px;padding:10px;">
+          <div style="font-size:14px;font-weight:700;" class="green">
+            AH VALUE: ${ahData.homeEV > (ahData.awayEV || -999) ? 'Home ' + lineStr : 'Away ' + (ahData.line >= 0 ? '' : '+') + (-ahData.line)}
+          </div>
+          <div style="font-size:12px;color:#bbb;margin-top:2px;">
+            EV: +${(Math.max(ahData.homeEV || 0, ahData.awayEV || 0) * 100).toFixed(1)}%
+          </div>
+        </div>
+      ` : ''}
+    `;
+  } else {
+    $('ahResult').innerHTML = '<div style="color:#666;font-size:13px;">Select an AH line above to see probabilities</div>';
+  }
+
+
+  // O/U Table with EV
+  var hasAnyOUOdds = ouData.some(function(o) { return o.overOdd || o.underOdd; });
+  var ouHeader = '<tr><th>Line</th><th>Over</th><th>Under</th>' + (hasAnyOUOdds ? '<th>Over EV</th><th>Under EV</th>' : '') + '</tr>';
+  var ouRows = ouData.map(function(o) {
+    var row = '<tr><td>' + o.line + '</td><td>' + (o.overProb*100).toFixed(1) + '%</td><td>' + (o.underProb*100).toFixed(1) + '%</td>';
+    if (hasAnyOUOdds) {
+      if (o.overEV !== null) {
+        row += '<td><span class="' + (o.overEV > 0 ? 'green' : 'red') + '">' + (o.overEV > 0 ? '+' : '') + (o.overEV*100).toFixed(1) + '%</span></td>';
+      } else { row += '<td><span class="dim">—</span></td>'; }
+      if (o.underEV !== null) {
+        row += '<td><span class="' + (o.underEV > 0 ? 'green' : 'red') + '">' + (o.underEV > 0 ? '+' : '') + (o.underEV*100).toFixed(1) + '%</span></td>';
+      } else { row += '<td><span class="dim">—</span></td>'; }
+    }
+    row += '</tr>';
+    return row;
+  }).join('');
+  $('ouTable').innerHTML = ouHeader + ouRows;
+
+  // Show O/U value bets
+  var ouValueBets = ouData.filter(function(o) { return (o.overEV && o.overEV > 0) || (o.underEV && o.underEV > 0); });
+  if (ouValueBets.length > 0) {
+    var bestOU = ouValueBets.reduce(function(best, o) {
+      var ev = Math.max(o.overEV || -999, o.underEV || -999);
+      if (ev > best.ev) return { line: o.line, overProb: o.overProb, underProb: o.underProb, overImplied: o.overImplied, underImplied: o.underImplied, ev: ev, side: (o.overEV || 0) > (o.underEV || 0) ? 'Over' : 'Under' };
+      return best;
+    }, { ev: -999 });
+    var modelP = bestOU.side === 'Over' ? bestOU.overProb : bestOU.underProb;
+    var mktP = bestOU.side === 'Over' ? bestOU.overImplied : bestOU.underImplied;
+    $('ouTable').insertAdjacentHTML('afterend',
+      '<div class="reco-box bet" style="margin-top:8px;padding:10px;">' +
+      '<div style="font-size:14px;font-weight:700;" class="green">O/U VALUE: ' + bestOU.side + ' ' + bestOU.line + '</div>' +
+      '<div style="font-size:12px;color:#bbb;margin-top:2px;">EV: +' + (bestOU.ev * 100).toFixed(1) + '% | Model: ' + (modelP * 100).toFixed(1) + '% vs Market: ' + (mktP * 100).toFixed(1) + '%</div></div>'
+    );
+  }
+
+  // Kelly Result
+  if (hasOdds && bankroll) {
+    function kellyRow(lbl, k) {
+      if (!k || k.pct <= 0) return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222;font-size:13px;"><span>' + lbl + '</span><span class="dim">No bet (EV-)</span></div>';
+      return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222;font-size:13px;"><span>' + lbl + '</span><span class="green">' + (k.pct * 100).toFixed(1) + '% = ' + k.amount.toFixed(0) + ' units</span></div>';
+    }
+    $('kellyResult').innerHTML = kellyRow('Home', homeKelly) + kellyRow('Draw', drawKelly) + kellyRow('Away', awayKelly) +
+      '<div style="font-size:11px;color:#666;margin-top:6px;">Using ' + $('kellyFrac').selectedOptions[0].text + ' | Bankroll: ' + bankroll + '</div>';
+  } else {
+    $('kellyResult').innerHTML = '<div style="color:#666;font-size:13px;">Enter odds + bankroll to see Kelly sizing</div>';
+  }
+
+  // Score Matrix (top 8)
+  scoreProbs.sort(function(a, b) { return b.p - a.p; });
+  var top8 = scoreProbs.slice(0, 8);
+  $('scoreMatrix').innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:6px;">' +
+    top8.map(function(s) {
+      return '<div style="background:#1a1a24;padding:8px 12px;border-radius:8px;text-align:center;min-width:70px;">' +
+        '<div style="font-weight:700;font-size:15px;">' + s.h + '-' + s.a + '</div>' +
+        '<div style="font-size:11px;color:#888;">' + (s.p / totalProb * 100).toFixed(1) + '%</div></div>';
+    }).join('') + '</div>';
+
+  $('recoBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// shortcut DOM
-const hsEl = document.getElementById("hs");
-const hlEl = document.getElementById("hl");
-const asEl = document.getElementById("as");
-const alEl = document.getElementById("al");
-const homeOddEl = document.getElementById("homeOdd");
-const drawOddEl = document.getElementById("drawOdd");
-const awayOddEl = document.getElementById("awayOdd");
-const result = document.getElementById("result");
+// ===== BET LOGGER =====
+function getBets() {
+  try { return JSON.parse(localStorage.getItem('hutao_bets') || '[]'); }
+  catch(e) { return []; }
+}
+function saveBets(bets) { localStorage.setItem('hutao_bets', JSON.stringify(bets)); }
 
+function logBet(type) {
+  if (!lastCalcResult && type === 'bet') { alert('Calculate first!'); return; }
+  var r = lastCalcResult || {};
+  var bet = {
+    id: Date.now(), type: type,
+    status: type === 'skip' ? 'skip' : 'pending',
+    homeTeam: r.homeTeam || $('homeTeam').value || 'Home',
+    awayTeam: r.awayTeam || $('awayTeam').value || 'Away',
+    league: r.league || $('league').value || '',
+    date: r.date || $('matchDate').value || new Date().toISOString().slice(0, 10),
+    homeLambda: r.homeLambda, awayLambda: r.awayLambda,
+    homeWin: r.homeWin, draw: r.draw, awayWin: r.awayWin,
+    homeOdd: r.homeOdd, drawOdd: r.drawOdd, awayOdd: r.awayOdd,
+    homeEV: r.homeEV, drawEV: r.drawEV, awayEV: r.awayEV,
+    ahData: r.ahData, ouData: r.ouData,
+    betOn: null, stake: null, oddTaken: null, closingOdd: null, result: null, pnl: null
+  };
+  if (type === 'bet') {
+    var bestEV = Math.max(r.homeEV || -999, r.drawEV || -999, r.awayEV || -999);
+    if (bestEV === r.homeEV) bet.betOn = 'Home';
+    else if (bestEV === r.drawEV) bet.betOn = 'Draw';
+    else bet.betOn = 'Away';
+    var kellys = [r.homeKelly, r.drawKelly, r.awayKelly];
+    var labels = ['Home', 'Draw', 'Away'];
+    var odds = [r.homeOdd, r.drawOdd, r.awayOdd];
+    var idx = labels.indexOf(bet.betOn);
+    bet.oddTaken = odds[idx];
+    bet.stake = kellys[idx] ? kellys[idx].amount : null;
+  }
+  var bets = getBets(); bets.unshift(bet); saveBets(bets);
+  alert(type === 'skip' ? 'Logged as SKIP (discipline!)' : 'Logged: ' + bet.betOn + ' @ ' + bet.oddTaken);
+}
+
+// ===== HISTORY =====
+var currentFilter = 'all';
+function filterHistory(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  renderHistory();
+}
+
+function renderHistory() {
+  var bets = getBets();
+  var filtered = currentFilter === 'all' ? bets : bets.filter(function(b) { return b.status === currentFilter; });
+  if (!filtered.length) {
+    $('historyList').innerHTML = '<div style="text-align:center;color:#666;padding:40px;">No bets logged yet. Start analyzing!</div>';
+    return;
+  }
+  $('historyList').innerHTML = filtered.map(function(b) {
+    var statusCls = b.status || 'pending';
+    var statusText = b.type === 'skip' ? 'SKIPPED' : (b.status === 'win' ? 'WON' : b.status === 'loss' ? 'LOST' : 'PENDING');
+    var details = '';
+    if (b.type === 'skip') { details = 'No value found — skipped'; }
+    else {
+      details = 'Bet: <b>' + b.betOn + '</b> @ ' + (b.oddTaken ? b.oddTaken.toFixed(2) : 'N/A');
+      if (b.stake) details += ' | Stake: ' + b.stake.toFixed(0);
+      if (b.homeEV !== null) details += ' | EV: ' + (Math.max(b.homeEV||0, b.drawEV||0, b.awayEV||0)*100).toFixed(1) + '%';
+      if (b.pnl !== null) details += ' | P/L: <b class="' + (b.pnl >= 0 ? 'green' : 'red') + '">' + (b.pnl >= 0 ? '+' : '') + b.pnl.toFixed(1) + '</b>';
+    }
+    if (b.closingOdd) details += '<br>CLV: ' + ((b.oddTaken / b.closingOdd - 1) * 100).toFixed(1) + '%';
+    var actions = '';
+    if (b.status === 'pending') {
+      actions = '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">' +
+        '<button class="btn btn-sm btn-primary" onclick="resolveBet(' + b.id + ',\'win\')">Won</button>' +
+        '<button class="btn btn-sm btn-danger" onclick="resolveBet(' + b.id + ',\'loss\')">Lost</button>' +
+        '<input id="closing-' + b.id + '" type="number" step="0.01" placeholder="Closing odd" style="width:100px;padding:6px;font-size:12px;">' +
+        '<button class="btn btn-sm btn-secondary" onclick="saveClosing(' + b.id + ')">Save CLV</button></div>';
+    }
+    return '<div class="history-item"><div class="history-header"><span class="history-teams">' + b.homeTeam + ' vs ' + b.awayTeam + '</span>' +
+      '<span class="history-result ' + statusCls + '">' + statusText + '</span></div>' +
+      '<div class="history-details">' + (b.league ? b.league + ' | ' : '') + b.date + '<br>' + details + '</div>' + actions + '</div>';
+  }).join('');
+}
+
+function resolveBet(id, result) {
+  var bets = getBets();
+  var bet = bets.find(function(b) { return b.id === id; });
+  if (!bet) return;
+  bet.status = result;
+  bet.pnl = result === 'win' ? (bet.stake ? (bet.oddTaken - 1) * bet.stake : (bet.oddTaken - 1)) : (bet.stake ? -bet.stake : -1);
+  saveBets(bets); renderHistory();
+}
+
+function saveClosing(id) {
+  var input = $('closing-' + id);
+  var co = parseFloat(input.value);
+  if (isNaN(co) || co <= 1) { alert('Enter a valid closing odd > 1.00'); return; }
+  var bets = getBets();
+  var bet = bets.find(function(b) { return b.id === id; });
+  if (!bet) return;
+  bet.closingOdd = co; saveBets(bets); renderHistory();
+}
+
+function clearHistory() {
+  if (confirm('Delete ALL bet history? This cannot be undone.')) { localStorage.removeItem('hutao_bets'); renderHistory(); }
+}
+
+// ===== STATS =====
+function renderStats() {
+  var bets = getBets().filter(function(b) { return b.type === 'bet'; });
+  var resolved = bets.filter(function(b) { return b.status === 'win' || b.status === 'loss'; });
+  var skips = getBets().filter(function(b) { return b.type === 'skip'; });
+  var wins = resolved.filter(function(b) { return b.status === 'win'; }).length;
+  var losses = resolved.filter(function(b) { return b.status === 'loss'; }).length;
+  var totalPnL = resolved.reduce(function(s, b) { return s + (b.pnl || 0); }, 0);
+  var totalStaked = resolved.reduce(function(s, b) { return s + (b.stake || 1); }, 0);
+  var roi = totalStaked > 0 ? (totalPnL / totalStaked * 100) : 0;
+  var winRate = resolved.length > 0 ? (wins / resolved.length * 100) : 0;
+  var avgEV = resolved.length ? (resolved.reduce(function(s,b){return s+Math.max(b.homeEV||0,b.drawEV||0,b.awayEV||0);},0)/resolved.length*100).toFixed(1)+'%' : '—';
+  var avgOdds = resolved.length ? (resolved.reduce(function(s,b){return s+(b.oddTaken||0);},0)/resolved.length).toFixed(2) : '—';
+  var pending = bets.filter(function(b){return b.status==='pending';}).length;
+
+  $('overallStats').innerHTML =
+    '<div class="stats-row">' +
+    '<div class="stat-card"><div class="stat-label">Total Bets</div><div class="stat-value">' + bets.length + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-value ' + (winRate>=50?'green':'red') + '">' + winRate.toFixed(0) + '%</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Skipped</div><div class="stat-value">' + skips.length + '</div></div></div>' +
+    '<div class="stats-row">' +
+    '<div class="stat-card"><div class="stat-label">W / L</div><div class="stat-value">' + wins + ' / ' + losses + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">P/L</div><div class="stat-value ' + (totalPnL>=0?'green':'red') + '">' + (totalPnL>=0?'+':'') + totalPnL.toFixed(1) + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">ROI</div><div class="stat-value ' + (roi>=0?'green':'red') + '">' + (roi>=0?'+':'') + roi.toFixed(1) + '%</div></div></div>' +
+    '<div class="stats-row">' +
+    '<div class="stat-card"><div class="stat-label">Avg EV</div><div class="stat-value">' + avgEV + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Avg Odds</div><div class="stat-value">' + avgOdds + '</div></div>' +
+    '<div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value yellow">' + pending + '</div></div></div>';
+
+  // CLV
+  var withCLV = resolved.filter(function(b){return b.closingOdd && b.oddTaken;});
+  if (withCLV.length > 0) {
+    var avgCLV = withCLV.reduce(function(s,b){return s+(b.oddTaken/b.closingOdd-1);},0)/withCLV.length*100;
+    var posCLV = withCLV.filter(function(b){return b.oddTaken>b.closingOdd;}).length;
+    $('clvStats').innerHTML =
+      '<div class="card-title">Closing Line Value (CLV)</div>' +
+      '<div style="display:flex;justify-content:space-around;text-align:center;padding:8px 0;">' +
+      '<div><div style="font-size:11px;color:#888;">Avg CLV</div><div style="font-size:20px;font-weight:800;" class="' + (avgCLV>=0?'green':'red') + '">' + (avgCLV>=0?'+':'') + avgCLV.toFixed(1) + '%</div></div>' +
+      '<div><div style="font-size:11px;color:#888;">Beat Closing</div><div style="font-size:20px;font-weight:800;">' + posCLV + '/' + withCLV.length + '</div></div>' +
+      '<div><div style="font-size:11px;color:#888;">Tracked</div><div style="font-size:20px;font-weight:800;">' + withCLV.length + '</div></div></div>' +
+      '<div style="font-size:11px;color:#666;margin-top:4px;">Positive CLV = betting at better odds than closing. Best predictor of long-term profit.</div>';
+  } else {
+    $('clvStats').innerHTML = '<div class="card-title">Closing Line Value (CLV)</div><div style="color:#666;font-size:13px;padding:8px 0;">No CLV data yet. Enter closing odds on pending bets before resolving.</div>';
+  }
+
+  // League Breakdown
+  var leagueMap = {};
+  resolved.forEach(function(b) {
+    var lg = b.league || 'Unknown';
+    if (!leagueMap[lg]) leagueMap[lg] = {w:0,l:0,pnl:0};
+    if (b.status === 'win') leagueMap[lg].w++; else leagueMap[lg].l++;
+    leagueMap[lg].pnl += (b.pnl || 0);
+  });
+  var leagueRows = Object.entries(leagueMap).sort(function(a,b){return b[1].pnl-a[1].pnl;}).map(function(e) {
+    var lg=e[0], d=e[1];
+    return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #222;font-size:13px;">' +
+      '<span style="flex:1">' + lg + '</span><span style="width:60px;text-align:center">' + d.w + 'W ' + d.l + 'L</span>' +
+      '<span style="width:60px;text-align:right;" class="' + (d.pnl>=0?'green':'red') + '">' + (d.pnl>=0?'+':'') + d.pnl.toFixed(1) + '</span></div>';
+  }).join('');
+  $('leagueBreakdown').innerHTML = '<div class="card-title">P/L by League</div>' + (leagueRows || '<div style="color:#666;font-size:13px;">No resolved bets yet.</div>');
+}
+
+// ===== INIT =====
+$('matchDate').valueAsDate = new Date();
 </script>
-
 </body>
 </html>
