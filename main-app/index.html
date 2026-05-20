@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poisson Pro</title>
+
+<style>
+body {
+  font-family: Arial;
+  padding: 15px;
+  background: #111;
+  color: #fff;
+}
+
+h2 { text-align: center; }
+
+.container {
+  max-width: 400px;
+  margin: auto;
+}
+
+input {
+  width: 45%;
+  padding: 10px;
+  margin: 5px;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  background: #00c853;
+  color: white;
+  font-size: 16px;
+}
+
+.card {
+  background: #1e1e1e;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.green { color: #00e676; }
+.red { color: #ff5252; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Poisson Pro</h2>
+
+<input id="hs" placeholder="Home Score">
+<input id="hl" placeholder="Home Loss"><br>
+<input id="as" placeholder="Away Score">
+<input id="al" placeholder="Away Loss">
+
+<div class="card">
+  <b>Optional Odds (Decimal)</b><br>
+  <input id="homeOdd" placeholder="Home">
+  <input id="drawOdd" placeholder="Draw">
+  <input id="awayOdd" placeholder="Away">
+</div>
+
+<button onclick="calc()">Calculate</button>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+function poisson(lambda, x) {
+  return (Math.pow(lambda, x) * Math.exp(-lambda)) / factorial(x);
+}
+
+function factorial(n) {
+  if (n === 0) return 1;
+  return n * factorial(n - 1);
+}
+
+function calc() {
+
+  let hs = parseFloat(hsEl.value);
+  let hl = parseFloat(hlEl.value);
+  let as = parseFloat(asEl.value);
+  let al = parseFloat(alEl.value);
+
+  let homeLambda = (hs + al) / 2;
+  let awayLambda = (as + hl) / 2;
+
+  let maxGoals = 10;
+
+  let homeWin = 0, draw = 0, awayWin = 0;
+  let over15 = 0, over25 = 0, over35 = 0, over45 = 0;
+
+  for (let i = 0; i <= maxGoals; i++) {
+    for (let j = 0; j <= maxGoals; j++) {
+
+      let p = poisson(homeLambda, i) * poisson(awayLambda, j);
+
+      if (i > j) homeWin += p;
+      else if (i === j) draw += p;
+      else awayWin += p;
+
+      let total = i + j;
+      if (total > 1.5) over15 += p;
+      if (total > 2.5) over25 += p;
+      if (total > 3.5) over35 += p;
+      if (total > 4.5) over45 += p;
+    }
+  }
+
+  // normalize to 100%
+  let totalProb = homeWin + draw + awayWin;
+  homeWin /= totalProb;
+  draw /= totalProb;
+  awayWin /= totalProb;
+
+  // EV calc
+  function ev(prob, odd) {
+    if (!odd) return null;
+    return (prob * odd) - 1;
+  }
+
+  let homeOdd = parseFloat(homeOddEl.value);
+  let drawOdd = parseFloat(drawOddEl.value);
+  let awayOdd = parseFloat(awayOddEl.value);
+
+  let homeEV = ev(homeWin, homeOdd);
+  let drawEV = ev(draw, drawOdd);
+  let awayEV = ev(awayWin, awayOdd);
+
+  function colorEV(v) {
+    if (v == null) return "";
+    return v > 0 ? "green" : "red";
+  }
+
+  result.innerHTML = `
+    <div class="card">
+      <b>Result</b><br>
+      Home Win: ${(homeWin*100).toFixed(1)}%
+      ${homeEV ? `<span class="${colorEV(homeEV)}">EV: ${homeEV.toFixed(2)}</span>` : ""}<br>
+      Draw: ${(draw*100).toFixed(1)}%
+      ${drawEV ? `<span class="${colorEV(drawEV)}">EV: ${drawEV.toFixed(2)}</span>` : ""}<br>
+      Away Win: ${(awayWin*100).toFixed(1)}%
+      ${awayEV ? `<span class="${colorEV(awayEV)}">EV: ${awayEV.toFixed(2)}</span>` : ""}
+    </div>
+
+    <div class="card grid">
+      <div>Over 1.5: ${(over15*100).toFixed(1)}%</div>
+      <div>Under 1.5: ${(100-over15*100).toFixed(1)}%</div>
+
+      <div>Over 2.5: ${(over25*100).toFixed(1)}%</div>
+      <div>Under 2.5: ${(100-over25*100).toFixed(1)}%</div>
+
+      <div>Over 3.5: ${(over35*100).toFixed(1)}%</div>
+      <div>Under 3.5: ${(100-over35*100).toFixed(1)}%</div>
+
+      <div>Over 4.5: ${(over45*100).toFixed(1)}%</div>
+      <div>Under 4.5: ${(100-over45*100).toFixed(1)}%</div>
+    </div>
+  `;
+}
+
+// shortcut DOM
+const hsEl = document.getElementById("hs");
+const hlEl = document.getElementById("hl");
+const asEl = document.getElementById("as");
+const alEl = document.getElementById("al");
+const homeOddEl = document.getElementById("homeOdd");
+const drawOddEl = document.getElementById("drawOdd");
+const awayOddEl = document.getElementById("awayOdd");
+const result = document.getElementById("result");
+
+</script>
+
+</body>
+</html>

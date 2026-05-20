@@ -28,6 +28,10 @@ This repo is a static football betting assistant. The current baseline is intent
 - Consider extracting betting math into a separate JS module if the app grows.
 - Add odds format conversion for MY/HK/decimal as requested in the roadmap.
 
+## Pages Publishing
+
+GitHub Pages should publish from `Bet_assist_app` branch root. The root `index.html` is a launcher, `main-app/index.html` holds the original main app, and `bet-assist-app/index.html` holds HuTao Bet Assistant.
+
 ## 2026-05-21 - Handoff
 
 Done:
