@@ -550,12 +550,12 @@ label {
         <input id="homeOdd" type="number" step="0.01" placeholder="2.10">
       </div>
       <div style="flex:1">
-        <label>Draw</label>
-        <input id="drawOdd" type="number" step="0.01" placeholder="3.40">
-      </div>
-      <div style="flex:1">
         <label>Away Win</label>
         <input id="awayOdd" type="number" step="0.01" placeholder="3.50">
+      </div>
+      <div style="flex:1">
+        <label>Draw</label>
+        <input id="drawOdd" type="number" step="0.01" placeholder="3.40">
       </div>
     </div>
   </div>
@@ -620,9 +620,39 @@ label {
       <input id="under05Odd" type="number" step="0.01" placeholder="Under">
     </div>
     <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 0.75</span>
+      <input id="over075Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under075Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 1.0</span>
+      <input id="over10Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under10Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 1.25</span>
+      <input id="over125Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under125Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
       <span class="ou-line-label">O/U 1.5</span>
       <input id="over15Odd" type="number" step="0.01" placeholder="Over">
       <input id="under15Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 1.75</span>
+      <input id="over175Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under175Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 2.0</span>
+      <input id="over20Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under20Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 2.25</span>
+      <input id="over225Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under225Odd" type="number" step="0.01" placeholder="Under">
     </div>
     <div class="ou-odds-row">
       <span class="ou-line-label">O/U 2.5</span>
@@ -630,9 +660,39 @@ label {
       <input id="under25Odd" type="number" step="0.01" placeholder="Under">
     </div>
     <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 2.75</span>
+      <input id="over275Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under275Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 3.0</span>
+      <input id="over30Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under30Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 3.25</span>
+      <input id="over325Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under325Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
       <span class="ou-line-label">O/U 3.5</span>
       <input id="over35Odd" type="number" step="0.01" placeholder="Over">
       <input id="under35Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 3.75</span>
+      <input id="over375Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under375Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 4.0</span>
+      <input id="over40Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under40Odd" type="number" step="0.01" placeholder="Under">
+    </div>
+    <div class="ou-odds-row">
+      <span class="ou-line-label">O/U 4.25</span>
+      <input id="over425Odd" type="number" step="0.01" placeholder="Over">
+      <input id="under425Odd" type="number" step="0.01" placeholder="Under">
     </div>
     <div class="ou-odds-row">
       <span class="ou-line-label">O/U 4.5</span>
@@ -722,8 +782,36 @@ label {
     </div>
 
     <!-- Log / Skip -->
-    <button class="btn btn-log" onclick="logBet('bet')">Log This Bet</button>
-    <button class="btn btn-skip" onclick="logBet('skip')">SKIP — No Value</button>
+    <div class="card" style="margin-top:12px;">
+      <div class="card-title">Log Bet</div>
+      <div style="margin-bottom:8px;">
+        <label>What are you betting on?</label>
+        <select id="logMarket" onchange="updateLogDetails()">
+          <option value="">— Select market —</option>
+          <option value="1x2-home">1X2: Home Win</option>
+          <option value="1x2-draw">1X2: Draw</option>
+          <option value="1x2-away">1X2: Away Win</option>
+        </select>
+      </div>
+      <div id="logCustomDetails" style="display:none;">
+        <div class="input-row">
+          <div style="flex:1">
+            <label>Odds Taken</label>
+            <input id="logOddTaken" type="number" step="0.01" placeholder="e.g. 1.95">
+          </div>
+          <div style="flex:1">
+            <label>Stake</label>
+            <input id="logStake" type="number" step="1" placeholder="e.g. 100">
+          </div>
+        </div>
+        <div style="margin-bottom:8px;">
+          <label>Notes (optional)</label>
+          <input id="logNotes" type="text" placeholder="e.g. Line moved, value play...">
+        </div>
+      </div>
+      <button class="btn btn-log" onclick="logBet('bet')">Log This Bet</button>
+      <button class="btn btn-skip" onclick="logBet('skip')">SKIP — No Value</button>
+    </div>
   </div>
 
 </div>
@@ -864,25 +952,34 @@ function showPage(page) {
 
 // ===== VALIDATION =====
 function validate() {
-  const required = [
-    { id: 'hs', name: 'Home Goals Scored' },
-    { id: 'hl', name: 'Home Goals Conceded' },
-    { id: 'as', name: 'Away Goals Scored' },
-    { id: 'al', name: 'Away Goals Conceded' }
-  ];
   const errors = [];
+  const w = parseInt($('formWeight').value);
+  const isRecentOnly = (w === 100);
 
-  for (const f of required) {
-    const v = val(f.id);
-    if (v === null || v < 0) errors.push(f.name + ' is required (≥ 0)');
-  }
-
-  // Check recent form: all or none
+  // Check recent form fields
   const recentFields = ['hs5', 'hl5', 'as5', 'al5'];
   const recentVals = recentFields.map(id => val(id));
-  const hasAny = recentVals.some(v => v !== null);
-  const hasAll = recentVals.every(v => v !== null && v >= 0);
-  if (hasAny && !hasAll) errors.push('Fill all 4 recent form fields, or leave all empty');
+  const hasAnyRecent = recentVals.some(v => v !== null);
+  const hasAllRecent = recentVals.every(v => v !== null && v >= 0);
+
+  if (isRecentOnly) {
+    // Recent Only mode: require recent form, season avg is optional
+    if (!hasAllRecent) errors.push('Recent Only mode: fill all 4 recent form fields');
+  } else {
+    // Normal mode: season avg is required
+    const seasonFields = [
+      { id: 'hs', name: 'Home Goals Scored' },
+      { id: 'hl', name: 'Home Goals Conceded' },
+      { id: 'as', name: 'Away Goals Scored' },
+      { id: 'al', name: 'Away Goals Conceded' }
+    ];
+    for (const f of seasonFields) {
+      const v = val(f.id);
+      if (v === null || v < 0) errors.push(f.name + ' is required (≥ 0)');
+    }
+    // Recent form: all or none
+    if (hasAnyRecent && !hasAllRecent) errors.push('Fill all 4 recent form fields, or leave all empty');
+  }
 
   // Odds: all or none
   const oddsFields = ['homeOdd', 'drawOdd', 'awayOdd'];
@@ -913,13 +1010,20 @@ function calculate() {
 
   // Lambda calculation (weighted if recent form provided)
   let homeLambda, awayLambda;
-  if (hs5 !== null && hl5 !== null && as5 !== null && al5 !== null) {
+  const hasRecent = hs5 !== null && hl5 !== null && as5 !== null && al5 !== null;
+  const hasSeason = hs !== null && hl !== null && as !== null && al !== null;
+
+  if (hasRecent && hasSeason) {
     const seasonHomeL = (hs + al) / 2;
     const seasonAwayL = (as + hl) / 2;
     const recentHomeL = (hs5 + al5) / 2;
     const recentAwayL = (as5 + hl5) / 2;
     homeLambda = seasonHomeL * (1 - w) + recentHomeL * w;
     awayLambda = seasonAwayL * (1 - w) + recentAwayL * w;
+  } else if (hasRecent) {
+    // Recent Only mode — use recent form directly
+    homeLambda = (hs5 + al5) / 2;
+    awayLambda = (as5 + hl5) / 2;
   } else {
     homeLambda = (hs + al) / 2;
     awayLambda = (as + hl) / 2;
@@ -927,27 +1031,22 @@ function calculate() {
 
   const maxGoals = 8;
   let homeWin = 0, draw = 0, awayWin = 0;
-  let over05 = 0, over15 = 0, over25 = 0, over35 = 0, over45 = 0;
   let btts = 0;
   const scoreProbs = [];
+  // Total goals probability distribution: totalGoalsDist[n] = P(total = n)
+  const totalGoalsDist = new Array(maxGoals * 2 + 1).fill(0);
 
   for (let i = 0; i <= maxGoals; i++) {
     for (let j = 0; j <= maxGoals; j++) {
       let p = poisson(homeLambda, i) * poisson(awayLambda, j);
-      // Dixon-Coles correction for low scores
       p *= dixonColesCorrection(i, j, homeLambda, awayLambda, rho);
-      p = Math.max(p, 0); // ensure non-negative
+      p = Math.max(p, 0);
 
       if (i > j) homeWin += p;
       else if (i === j) draw += p;
       else awayWin += p;
 
-      const total = i + j;
-      if (total > 0.5) over05 += p;
-      if (total > 1.5) over15 += p;
-      if (total > 2.5) over25 += p;
-      if (total > 3.5) over35 += p;
-      if (total > 4.5) over45 += p;
+      totalGoalsDist[i + j] += p;
       if (i > 0 && j > 0) btts += p;
 
       scoreProbs.push({ h: i, a: j, p: p });
@@ -959,11 +1058,41 @@ function calculate() {
   homeWin /= totalProb;
   draw /= totalProb;
   awayWin /= totalProb;
-
-  // Normalize O/U and BTTS too
-  over05 /= totalProb; over15 /= totalProb; over25 /= totalProb;
-  over35 /= totalProb; over45 /= totalProb;
   btts /= totalProb;
+
+  // Normalize total goals distribution
+  for (let n = 0; n < totalGoalsDist.length; n++) totalGoalsDist[n] /= totalProb;
+
+  // General O/U probability function
+  // For half-lines (0.5, 1.5, ...): no push, clear over/under
+  // For whole-lines (1.0, 2.0, ...): push = P(total == line)
+  // For quarter-lines (0.75, 1.25, ...): split into two adjacent bets
+  function calcOUProb(line) {
+    const frac = line % 1;
+    if (frac === 0.25 || frac === 0.75) {
+      // Quarter line: split into two adjacent half/whole lines
+      var lineA = Math.floor(line * 2) / 2;
+      var lineB = Math.ceil(line * 2) / 2;
+      var pA = calcOUSingle(lineA);
+      var pB = calcOUSingle(lineB);
+      return {
+        overProb: (pA.overProb + pB.overProb) / 2,
+        underProb: (pA.underProb + pB.underProb) / 2,
+        pushProb: (pA.pushProb + pB.pushProb) / 2
+      };
+    }
+    return calcOUSingle(line);
+  }
+
+  function calcOUSingle(line) {
+    var overProb = 0, underProb = 0, pushProb = 0;
+    for (var n = 0; n < totalGoalsDist.length; n++) {
+      if (n > line) overProb += totalGoalsDist[n];
+      else if (n === line) pushProb += totalGoalsDist[n];
+      else underProb += totalGoalsDist[n];
+    }
+    return { overProb: overProb, underProb: underProb, pushProb: pushProb };
+  }
 
   // Odds & EV & Kelly
   const homeOdd = val('homeOdd'), drawOdd = val('drawOdd'), awayOdd = val('awayOdd');
@@ -1031,27 +1160,30 @@ function calculate() {
   }
 
   // ===== OVER/UNDER WITH ODDS =====
-  const ouLines = [
-    { line: '0.5', prob: over05 },
-    { line: '1.5', prob: over15 },
-    { line: '2.5', prob: over25 },
-    { line: '3.5', prob: over35 },
-    { line: '4.5', prob: over45 }
-  ];
+  const ouLineValues = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5];
 
-  const ouData = ouLines.map(ou => {
-    const overOdd = val('over' + ou.line.replace('.', '') + 'Odd');
-    const underOdd = val('under' + ou.line.replace('.', '') + 'Odd');
-    const overProb = ou.prob;
-    const underProb = 1 - ou.prob;
+  const ouData = ouLineValues.map(function(lineVal) {
+    var lineStr = lineVal % 1 === 0 ? lineVal.toFixed(1) : '' + lineVal;
+    // Build input ID key: "0.5"->"05", "0.75"->"075", "1.0"->"10", etc.
+    var idKey = lineStr.replace('.', '');
+    var overOdd = val('over' + idKey + 'Odd');
+    var underOdd = val('under' + idKey + 'Odd');
+    var prob = calcOUProb(lineVal);
+    // Effective prob: for quarter/whole lines, push counts as half win/half loss
+    var overEffective = prob.overProb + prob.pushProb * 0.5;
+    var underEffective = prob.underProb + prob.pushProb * 0.5;
     return {
-      line: ou.line,
-      overProb,
-      underProb,
-      overOdd,
-      underOdd,
-      overEV: overOdd ? (overProb * overOdd - 1) : null,
-      underEV: underOdd ? (underProb * underOdd - 1) : null,
+      line: lineStr,
+      lineVal: lineVal,
+      overProb: prob.overProb,
+      underProb: prob.underProb,
+      pushProb: prob.pushProb,
+      overEffective: overEffective,
+      underEffective: underEffective,
+      overOdd: overOdd,
+      underOdd: underOdd,
+      overEV: overOdd ? (overEffective * overOdd - 1) : null,
+      underEV: underOdd ? (underEffective * underOdd - 1) : null,
       overImplied: overOdd ? 1 / overOdd : null,
       underImplied: underOdd ? 1 / underOdd : null
     };
@@ -1064,8 +1196,7 @@ function calculate() {
     league: $('league').value || 'N/A',
     date: $('matchDate').value || new Date().toISOString().slice(0, 10),
     homeLambda, awayLambda, rho,
-    homeWin, draw, awayWin,
-    over05, over15, over25, over35, over45, btts,
+    homeWin, draw, awayWin, btts,
     homeOdd, drawOdd, awayOdd,
     homeEV, drawEV, awayEV,
     homeImpl, drawImpl, awayImpl,
@@ -1214,11 +1345,19 @@ function calculate() {
   }
 
 
-  // O/U Table with EV
-  var hasAnyOUOdds = ouData.some(function(o) { return o.overOdd || o.underOdd; });
-  var ouHeader = '<tr><th>Line</th><th>Over</th><th>Under</th>' + (hasAnyOUOdds ? '<th>Over EV</th><th>Under EV</th>' : '') + '</tr>';
-  var ouRows = ouData.map(function(o) {
-    var row = '<tr><td>' + o.line + '</td><td>' + (o.overProb*100).toFixed(1) + '%</td><td>' + (o.underProb*100).toFixed(1) + '%</td>';
+  // O/U Table with EV — only show lines that have odds entered
+  var ouWithOddsData = ouData.filter(function(o) { return o.overOdd || o.underOdd; });
+  var ouToShow = ouWithOddsData.length > 0 ? ouWithOddsData : ouData.filter(function(o) {
+    // Default: show the classic half-lines if no odds entered at all
+    return [0.5, 1.5, 2.5, 3.5, 4.5].indexOf(o.lineVal) >= 0;
+  });
+  var hasAnyOUOdds = ouWithOddsData.length > 0;
+  var hasPushLines = ouToShow.some(function(o) { return o.pushProb > 0.001; });
+  var ouHeader = '<tr><th>Line</th><th>Over</th>' + (hasPushLines ? '<th>Push</th>' : '') + '<th>Under</th>' + (hasAnyOUOdds ? '<th>Over EV</th><th>Under EV</th>' : '') + '</tr>';
+  var ouRows = ouToShow.map(function(o) {
+    var row = '<tr><td>' + o.line + '</td><td>' + (o.overProb*100).toFixed(1) + '%</td>';
+    if (hasPushLines) row += '<td>' + (o.pushProb > 0.001 ? (o.pushProb*100).toFixed(1) + '%' : '<span class="dim">—</span>') + '</td>';
+    row += '<td>' + (o.underProb*100).toFixed(1) + '%</td>';
     if (hasAnyOUOdds) {
       if (o.overEV !== null) {
         row += '<td><span class="' + (o.overEV > 0 ? 'green' : 'red') + '">' + (o.overEV > 0 ? '+' : '') + (o.overEV*100).toFixed(1) + '%</span></td>';
@@ -1232,7 +1371,10 @@ function calculate() {
   }).join('');
   $('ouTable').innerHTML = ouHeader + ouRows;
 
-  // Show O/U value bets
+  // Show O/U value bets — remove old recommendation first
+  var oldOUReco = document.getElementById('ouValueReco');
+  if (oldOUReco) oldOUReco.remove();
+
   var ouValueBets = ouData.filter(function(o) { return (o.overEV && o.overEV > 0) || (o.underEV && o.underEV > 0); });
   if (ouValueBets.length > 0) {
     var bestOU = ouValueBets.reduce(function(best, o) {
@@ -1243,7 +1385,7 @@ function calculate() {
     var modelP = bestOU.side === 'Over' ? bestOU.overProb : bestOU.underProb;
     var mktP = bestOU.side === 'Over' ? bestOU.overImplied : bestOU.underImplied;
     $('ouTable').insertAdjacentHTML('afterend',
-      '<div class="reco-box bet" style="margin-top:8px;padding:10px;">' +
+      '<div id="ouValueReco" class="reco-box bet" style="margin-top:8px;padding:10px;">' +
       '<div style="font-size:14px;font-weight:700;" class="green">O/U VALUE: ' + bestOU.side + ' ' + bestOU.line + '</div>' +
       '<div style="font-size:12px;color:#bbb;margin-top:2px;">EV: +' + (bestOU.ev * 100).toFixed(1) + '% | Model: ' + (modelP * 100).toFixed(1) + '% vs Market: ' + (mktP * 100).toFixed(1) + '%</div></div>'
     );
@@ -1271,6 +1413,9 @@ function calculate() {
         '<div style="font-size:11px;color:#888;">' + (s.p / totalProb * 100).toFixed(1) + '%</div></div>';
     }).join('') + '</div>';
 
+  // Rebuild log market dropdown with AH/OU options
+  rebuildLogMarketOptions();
+
   $('recoBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -1281,9 +1426,96 @@ function getBets() {
 }
 function saveBets(bets) { localStorage.setItem('hutao_bets', JSON.stringify(bets)); }
 
+// Update market selector with AH/OU options from current calc
+function updateLogDetails() {
+  var sel = $('logMarket').value;
+  $('logCustomDetails').style.display = sel ? 'block' : 'none';
+  // Pre-fill odds from calculation
+  if (!lastCalcResult) return;
+  var r = lastCalcResult;
+  var odd = null;
+  if (sel === '1x2-home') odd = r.homeOdd;
+  else if (sel === '1x2-draw') odd = r.drawOdd;
+  else if (sel === '1x2-away') odd = r.awayOdd;
+  else if (sel === 'ah-home' && r.ahData) odd = r.ahData.homeOdd;
+  else if (sel === 'ah-away' && r.ahData) odd = r.ahData.awayOdd;
+  else if (sel.startsWith('ou-')) {
+    var parts = sel.split('-'); // e.g. ou-over-25
+    var side = parts[1]; // over or under
+    var lineKey = parts[2]; // 25
+    var ouItem = r.ouData ? r.ouData.find(function(o) { return o.line.replace('.','') === lineKey; }) : null;
+    if (ouItem) odd = side === 'over' ? ouItem.overOdd : ouItem.underOdd;
+  }
+  if (odd) $('logOddTaken').value = odd.toFixed(2);
+  else $('logOddTaken').value = '';
+
+  // Pre-fill Kelly stake if available
+  var kellyStake = null;
+  if (sel === '1x2-home' && r.homeKelly && r.homeKelly.amount > 0) kellyStake = r.homeKelly.amount;
+  else if (sel === '1x2-draw' && r.drawKelly && r.drawKelly.amount > 0) kellyStake = r.drawKelly.amount;
+  else if (sel === '1x2-away' && r.awayKelly && r.awayKelly.amount > 0) kellyStake = r.awayKelly.amount;
+  if (kellyStake) $('logStake').value = kellyStake.toFixed(0);
+  else $('logStake').value = '';
+}
+
+// Rebuild the market dropdown options based on calc results
+function rebuildLogMarketOptions() {
+  var sel = $('logMarket');
+  // Keep static 1x2 options, remove old dynamic ones
+  while (sel.options.length > 4) sel.remove(4);
+
+  if (!lastCalcResult) return;
+  var r = lastCalcResult;
+
+  // AH options
+  if (r.ahData) {
+    var lineStr = r.ahData.line >= 0 ? '+' + r.ahData.line : '' + r.ahData.line;
+    var ahGroup = document.createElement('optgroup');
+    ahGroup.label = 'Asian Handicap ' + lineStr;
+    var optH = document.createElement('option');
+    optH.value = 'ah-home';
+    optH.textContent = 'AH: Home ' + lineStr;
+    ahGroup.appendChild(optH);
+    var optA = document.createElement('option');
+    optA.value = 'ah-away';
+    optA.textContent = 'AH: Away ' + (r.ahData.line >= 0 ? '' : '+') + (-r.ahData.line);
+    ahGroup.appendChild(optA);
+    sel.appendChild(ahGroup);
+  }
+
+  // O/U options — only lines that have odds
+  var ouWithOdds = (r.ouData || []).filter(function(o) { return o.overOdd || o.underOdd; });
+  if (ouWithOdds.length > 0) {
+    var ouGroup = document.createElement('optgroup');
+    ouGroup.label = 'Over / Under';
+    ouWithOdds.forEach(function(o) {
+      var lineKey = o.line.replace('.', '');
+      if (o.overOdd) {
+        var oOpt = document.createElement('option');
+        oOpt.value = 'ou-over-' + lineKey;
+        oOpt.textContent = 'Over ' + o.line + ' @ ' + o.overOdd.toFixed(2);
+        ouGroup.appendChild(oOpt);
+      }
+      if (o.underOdd) {
+        var uOpt = document.createElement('option');
+        uOpt.value = 'ou-under-' + lineKey;
+        uOpt.textContent = 'Under ' + o.line + ' @ ' + o.underOdd.toFixed(2);
+        ouGroup.appendChild(uOpt);
+      }
+    });
+    sel.appendChild(ouGroup);
+  }
+}
+
 function logBet(type) {
   if (!lastCalcResult && type === 'bet') { alert('Calculate first!'); return; }
   var r = lastCalcResult || {};
+
+  if (type === 'bet') {
+    var market = $('logMarket').value;
+    if (!market) { alert('Select what you are betting on first!'); return; }
+  }
+
   var bet = {
     id: Date.now(), type: type,
     status: type === 'skip' ? 'skip' : 'pending',
@@ -1296,22 +1528,46 @@ function logBet(type) {
     homeOdd: r.homeOdd, drawOdd: r.drawOdd, awayOdd: r.awayOdd,
     homeEV: r.homeEV, drawEV: r.drawEV, awayEV: r.awayEV,
     ahData: r.ahData, ouData: r.ouData,
-    betOn: null, stake: null, oddTaken: null, closingOdd: null, result: null, pnl: null
+    market: null, betOn: null, stake: null, oddTaken: null,
+    closingOdd: null, result: null, pnl: null, notes: null
   };
+
   if (type === 'bet') {
-    var bestEV = Math.max(r.homeEV || -999, r.drawEV || -999, r.awayEV || -999);
-    if (bestEV === r.homeEV) bet.betOn = 'Home';
-    else if (bestEV === r.drawEV) bet.betOn = 'Draw';
-    else bet.betOn = 'Away';
-    var kellys = [r.homeKelly, r.drawKelly, r.awayKelly];
-    var labels = ['Home', 'Draw', 'Away'];
-    var odds = [r.homeOdd, r.drawOdd, r.awayOdd];
-    var idx = labels.indexOf(bet.betOn);
-    bet.oddTaken = odds[idx];
-    bet.stake = kellys[idx] ? kellys[idx].amount : null;
+    var market = $('logMarket').value;
+    var customOdd = parseFloat($('logOddTaken').value);
+    var customStake = parseFloat($('logStake').value);
+    bet.notes = $('logNotes').value || null;
+
+    if (market.startsWith('1x2-')) {
+      bet.market = '1X2';
+      bet.betOn = market === '1x2-home' ? 'Home' : market === '1x2-draw' ? 'Draw' : 'Away';
+    } else if (market.startsWith('ah-')) {
+      var lineStr = r.ahData ? (r.ahData.line >= 0 ? '+' + r.ahData.line : '' + r.ahData.line) : '';
+      bet.market = 'AH ' + lineStr;
+      bet.betOn = market === 'ah-home' ? 'Home ' + lineStr : 'Away ' + (r.ahData ? (r.ahData.line >= 0 ? '' : '+') + (-r.ahData.line) : '');
+    } else if (market.startsWith('ou-')) {
+      var parts = market.split('-');
+      var side = parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
+      var lineNum = parts[2];
+      // Reconstruct line display: "25" -> "2.5"
+      var lineDisp = lineNum.length >= 2 ? lineNum.slice(0,-1) + '.' + lineNum.slice(-1) : lineNum;
+      bet.market = 'O/U ' + lineDisp;
+      bet.betOn = side + ' ' + lineDisp;
+    }
+
+    bet.oddTaken = !isNaN(customOdd) && customOdd > 1 ? customOdd : null;
+    bet.stake = !isNaN(customStake) && customStake > 0 ? customStake : null;
   }
+
   var bets = getBets(); bets.unshift(bet); saveBets(bets);
-  alert(type === 'skip' ? 'Logged as SKIP (discipline!)' : 'Logged: ' + bet.betOn + ' @ ' + bet.oddTaken);
+  // Reset form
+  $('logMarket').value = '';
+  $('logCustomDetails').style.display = 'none';
+  $('logOddTaken').value = '';
+  $('logStake').value = '';
+  $('logNotes').value = '';
+
+  alert(type === 'skip' ? 'Logged as SKIP (discipline!)' : 'Logged: ' + bet.betOn + ' @ ' + (bet.oddTaken ? bet.oddTaken.toFixed(2) : 'N/A'));
 }
 
 // ===== HISTORY =====
@@ -1336,10 +1592,12 @@ function renderHistory() {
     var details = '';
     if (b.type === 'skip') { details = 'No value found — skipped'; }
     else {
-      details = 'Bet: <b>' + b.betOn + '</b> @ ' + (b.oddTaken ? b.oddTaken.toFixed(2) : 'N/A');
+      var marketLabel = b.market ? '<span style="color:#64b5f6;">[' + b.market + ']</span> ' : '';
+      details = marketLabel + 'Bet: <b>' + b.betOn + '</b> @ ' + (b.oddTaken ? b.oddTaken.toFixed(2) : 'N/A');
       if (b.stake) details += ' | Stake: ' + b.stake.toFixed(0);
       if (b.homeEV !== null) details += ' | EV: ' + (Math.max(b.homeEV||0, b.drawEV||0, b.awayEV||0)*100).toFixed(1) + '%';
       if (b.pnl !== null) details += ' | P/L: <b class="' + (b.pnl >= 0 ? 'green' : 'red') + '">' + (b.pnl >= 0 ? '+' : '') + b.pnl.toFixed(1) + '</b>';
+      if (b.notes) details += '<br><span style="color:#888;font-style:italic;">' + b.notes + '</span>';
     }
     if (b.closingOdd) details += '<br>CLV: ' + ((b.oddTaken / b.closingOdd - 1) * 100).toFixed(1) + '%';
     var actions = '';

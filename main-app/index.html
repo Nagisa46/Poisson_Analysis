@@ -51,6 +51,11 @@ button {
   gap: 10px;
 }
 
+.btn-clear {
+  background: #444;
+  color: #ddd;
+}
+
 .green { color: #00e676; }
 .red { color: #ff5252; }
 </style>
@@ -74,6 +79,7 @@ button {
   <input id="awayOdd" placeholder="Away">
 </div>
 
+<button class="btn-clear" onclick="clearAll()">Clear</button>
 <button onclick="calc()">Calculate</button>
 
 <div id="result"></div>
@@ -172,6 +178,13 @@ function calc() {
       <div>Under 4.5: ${(100-over45*100).toFixed(1)}%</div>
     </div>
   `;
+}
+
+// clear all inputs and results for the next match
+function clearAll() {
+  [hsEl, hlEl, asEl, alEl, homeOddEl, drawOddEl, awayOddEl].forEach(el => el.value = "");
+  result.innerHTML = "";
+  hsEl.focus();
 }
 
 // shortcut DOM
