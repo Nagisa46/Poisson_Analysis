@@ -1,0 +1,386 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>3P Farming Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F2F3EE; --surface:#FFFFFF; --sunk:#E8EBE3; --ink:#1E2721; --muted:#5E6A61; --line:#D6DBD1;
+  --field:#3A6B45; --field-soft:#DCE8DD; --wheat:#B7862A; --wheat-soft:#F3E7C9;
+  --good:#2F7A45; --warn:#A87414; --bad:#A4492F; --bad-soft:#F4DDD5;
+  --display:"Zilla Slab",Georgia,serif; --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;--ground:#131814;--surface:#1B221D;--sunk:#222B25;--ink:#E4E9E1;--muted:#98A59B;--line:#2F3A32;
+  --field:#7DB38A;--field-soft:#23392A;--wheat:#DDB25A;--wheat-soft:#3A3120;--good:#6FC08A;--warn:#E0A94A;--bad:#E28468;--bad-soft:#3E2620;}}
+:root[data-theme="dark"]{
+  color-scheme:dark;--ground:#131814;--surface:#1B221D;--sunk:#222B25;--ink:#E4E9E1;--muted:#98A59B;--line:#2F3A32;
+  --field:#7DB38A;--field-soft:#23392A;--wheat:#DDB25A;--wheat-soft:#3A3120;--good:#6FC08A;--warn:#E0A94A;--bad:#E28468;--bad-soft:#3E2620;}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15px/1.55 var(--body);margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:28px 64px;display:grid;gap:28px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(28px,5vw,40px);font-weight:700}
+h2{font-size:22px;font-weight:700}
+h3{font-size:17px;font-weight:700}
+.eyebrow{font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+p{margin:0}
+.muted{color:var(--muted)}
+header.top{display:grid;gap:12px}
+.lede{max-width:68ch;color:var(--muted)}
+.lede strong{color:var(--ink)}
+
+/* settings */
+.settings{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:end;padding:14px 16px;background:var(--sunk);border-radius:10px}
+.settings label{display:grid;gap:4px;font-size:12px;color:var(--muted);font-weight:500}
+select,input[type=number],input[type=datetime-local]{font:14px var(--body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-height:34px}
+input[type=number]{width:74px;font-family:var(--mono)}
+select:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--field);outline-offset:2px}
+.save-state{margin-left:auto;font:12px var(--mono);color:var(--muted)}
+
+/* summary */
+.summary{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+@media (max-width:760px){.summary{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;align-content:start}
+.bigprog{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.bigprog .pct{font:700 44px/1 var(--display)}
+.bar{height:10px;background:var(--sunk);border-radius:99px;overflow:hidden;position:relative}
+.bar i{display:block;height:100%;background:var(--field);border-radius:99px;transition:width .3s}
+.bar.wheat i{background:var(--wheat)}
+.phasebars{display:grid;gap:6px}
+.pb{display:grid;grid-template-columns:minmax(0,1fr) 90px 44px;gap:10px;align-items:center;font-size:13px}
+.pb span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb .bar{height:6px}
+.next{padding:10px 12px;background:var(--field-soft);border-radius:8px;font-size:14px}
+.next b{font-weight:600}
+
+.compare{display:grid;gap:0}
+.crow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px 12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.crow:first-child{border-top:0;padding-top:0}
+.crow .lbl{font-size:13px;color:var(--muted)}
+.crow .val{font-size:15px;font-weight:600}
+.chip{font:500 11px/1 var(--mono);padding:5px 8px;border-radius:99px;white-space:nowrap;letter-spacing:.02em}
+.chip.ok{background:var(--field-soft);color:var(--good)}
+.chip.warn{background:var(--wheat-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.crow .sub{grid-column:1/-1;font-size:12px;color:var(--muted)}
+
+.time{display:grid;gap:8px}
+.timeline{position:relative;height:28px;background:var(--sunk);border-radius:6px;overflow:hidden}
+.timeline .win{position:absolute;top:0;bottom:0;background:var(--wheat-soft);border-inline:2px solid var(--wheat)}
+.timeline .now{position:absolute;top:0;bottom:0;width:2px;background:var(--ink)}
+.timeline .prog{position:absolute;left:0;bottom:0;height:4px;background:var(--field)}
+.tl-axis{display:flex;justify-content:space-between;font:11px var(--mono);color:var(--muted)}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+@media (max-width:760px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{background:var(--surface);padding:12px 14px;display:grid;gap:2px}
+.stat .v{font:600 20px/1.2 var(--mono);font-variant-numeric:tabular-nums}
+.stat .k{font-size:12px;color:var(--muted)}
+
+/* phases */
+.phase{display:grid;gap:10px}
+.phase-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.tip{font-size:14px;color:var(--ink);background:var(--wheat-soft);border-radius:8px;padding:10px 14px;max-width:80ch;white-space:pre-line}
+.tip b{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--warn);display:block;margin-bottom:2px}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+.row{display:grid;grid-template-columns:36px minmax(170px,1.6fr) 48px 116px 88px 64px 52px 96px;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid var(--line);min-width:720px}
+.row.head{border-top:0;font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-block:10px 6px}
+.row .r{text-align:right}
+.row.task{cursor:pointer}
+.row.task:hover{background:var(--sunk)}
+.row.done .tname{text-decoration:line-through;text-decoration-color:var(--muted);color:var(--muted)}
+.row.skip{opacity:.45}
+.tname{display:grid;gap:1px}
+.tname small{font-size:12px;color:var(--muted)}
+.tier{font:500 11px var(--mono);color:var(--field);background:var(--field-soft);border-radius:4px;padding:2px 6px;justify-self:start}
+.neg{color:var(--bad)}
+input[type=checkbox]{width:20px;height:20px;accent-color:var(--field);cursor:pointer;margin:0}
+.row input[type=number]{width:62px;min-height:28px;padding:3px 6px}
+.intro-table{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}
+th,td{padding:8px 12px;text-align:left;border-top:1px solid var(--line)}
+th{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-top:0}
+tr.me td{background:var(--field-soft);font-weight:600}
+.btn{font:500 13px var(--body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:6px;padding:6px 12px;cursor:pointer}
+.btn.danger{color:var(--bad)}
+footer{font-size:12px;color:var(--muted);display:grid;gap:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Travian T4.6 start guide · by Caím</span>
+    <h1>3 Party — Farming</h1>
+    <p class="lede"><strong>The way to go for any real farmer who also wants a good base.</strong> The 3P strategy leaves more time to profit from your investment because the first party is needed later. It goes for a lot of resource income early and invests in CP afterwards. Getting the CP fixed costs more, but you'll also have more resources to invest, and the base you end up with keeps paying off after settling. It needs a lot of activity and know-how — one slip and it may not pay off.</p>
+  </header>
+
+  <section class="settings" aria-label="Your setup">
+    <label for="tribe">Tribe<select id="tribe"><option>Teuton</option><option>Gaul</option><option>Roman</option></select></label>
+    <label for="unit">Farm unit<select id="unit"></select></label>
+    <label for="hero">Hero level<input type="number" id="hero" min="0" max="100" value="0"></label>
+    <label for="start">Your start time<input type="datetime-local" id="start"></label>
+    <label for="farm">Day-1 farmed resources<select id="farm">
+      <option value="0">0 – 20k</option><option value="1">20 – 40k</option><option value="2">40 – 80k</option><option value="3">80k +</option></select></label>
+    <span class="save-state" id="saveState">Loading…</span>
+  </section>
+
+  <section class="summary" aria-label="Progress summary">
+    <div class="panel">
+      <span class="eyebrow">Overall progress</span>
+      <div class="bigprog"><span class="pct num" id="pct">0%</span><span class="muted" id="countTxt"></span></div>
+      <div class="bar"><i id="mainBar" style="width:0"></i></div>
+      <div class="next" id="nextTask"></div>
+      <div class="phasebars" id="phaseBars"></div>
+    </div>
+    <div class="panel">
+      <span class="eyebrow">Versus expectation · Introduction sheet</span>
+      <div class="compare" id="compare"></div>
+    </div>
+  </section>
+
+  <section class="panel time" aria-label="Settling timeline">
+    <div class="phase-head"><h3>Settling timeline</h3><span class="muted" id="timeTxt"></span></div>
+    <div class="timeline" id="timeline"><div class="win" id="win"></div><div class="prog" id="tprog"></div><div class="now" id="now"></div></div>
+    <div class="tl-axis"><span>0 h</span><span>40 h</span><span>80 h</span><span>120 h</span><span>160 h</span></div>
+    <p class="muted" style="font-size:13px">Shaded band = expected settle window for your day-1 farm bracket. Black line = time elapsed since your start. Green strip = your task progress, mapped onto the window's far edge.</p>
+  </section>
+
+  <section class="stats" aria-label="Running totals" id="stats"></section>
+
+  <div id="phases" style="display:grid;gap:32px"></div>
+
+  <section class="phase" aria-label="Strategy comparison">
+    <div class="phase-head"><h2>Expectations for every style</h2><span class="muted">From the Introduction sheet</span></div>
+    <div class="intro-table"><table>
+      <thead><tr><th>Strategy</th><th>Day-1 farm 0–20k</th><th>20–40k</th><th>40–80k</th><th>80k+</th><th>CP prod</th><th>Resource fields</th><th>Troops</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>4P Sim &amp; Hero Raiding</td><td>~120(+) h</td><td>105–120 h</td><td>95–105 h</td><td>&lt;95 h</td><td>~180+</td><td>All lv5</td><td>0 crop</td><td>Done</td></tr>
+        <tr><td>4P Farming *</td><td>~120(+) h</td><td>105–120 h</td><td>95–105 h</td><td>&lt;95 h</td><td>~180+</td><td>Crop lv5, rest 4</td><td>~25+ crop</td><td>Testing</td></tr>
+        <tr><td>3P Sim &amp; Hero Raiding</td><td>~120(+) h</td><td>105–120 h</td><td>95–105 h</td><td>&lt;95 h</td><td>~210+</td><td>All lv5, 1 crop 7</td><td>0 crop</td><td>Done</td></tr>
+        <tr class="me"><td>3P Farming * (this plan)</td><td>~120(+) h</td><td>105–120 h</td><td>95–105 h</td><td>&lt;95 h</td><td>~230+</td><td>All lv5, 1 crop 7</td><td>~50+ crop</td><td>Done · Apr 2022</td></tr>
+        <tr><td>Lazy decent Sim</td><td>120–144 h</td><td>—</td><td>—</td><td>—</td><td>~200</td><td>All lv5</td><td>0 crop</td><td>To be updated</td></tr>
+        <tr><td>Lazy good Sim</td><td>192–240 h</td><td>—</td><td>—</td><td>—</td><td>—</td><td>All lv8</td><td>0 crop</td><td>To be continued</td></tr>
+      </tbody></table></div>
+    <p class="muted" style="font-size:13px">* Farming amount is pure profit on the first day. Investing in troops doesn't pay back immediately, but it helps you settle.</p>
+  </section>
+
+  <footer>
+    <div><button class="btn danger" id="reset" type="button">Clear all checkmarks</button> <span id="resetConfirm" hidden>Sure? <button class="btn danger" id="resetYes" type="button">Yes, clear</button> <button class="btn" id="resetNo" type="button">Cancel</button></span></div>
+    <p>Costs, rewards, CP and population come from the “4 - 3P - Farming” sheet. Rewards scale by +2% per hero level, the same way the sheet calculates them. Balance = starting 3,000 resources + rewards from earlier tasks − costs so far. A negative number is what your fields, raids and farms still need to produce.</p>
+  </footer>
+</div>
+
+<script>
+const TASKS = [{"r": 6, "name": "Main Building", "tier": 1, "target": "to 1", "done": true, "cost": null, "rr": 600, "re": 10, "scale": true, "cp": 2, "pop": 2, "opt": false}, {"r": 7, "name": "Woodcutters", "tier": 1, "target": "1x to 2", "done": true, "cost": null, "rr": 600, "re": 10, "scale": true, "cp": 1, "pop": 3, "opt": false}, {"r": 8, "name": "Croplands", "tier": 1, "target": "1x to 2", "done": true, "cost": null, "rr": 600, "re": 10, "scale": true, "cp": 1, "pop": 0, "opt": false}, {"r": 9, "name": "Rally Point", "tier": 1, "target": "to 1", "done": true, "cost": null, "rr": 600, "re": 10, "scale": true, "cp": 1, "pop": 1, "opt": false}, {"r": 10, "name": "Clay pits", "tier": 1, "target": "1x to 2", "done": false, "cost": 420, "rr": 600, "re": 10, "scale": true, "cp": 1, "pop": 3, "opt": false}, {"r": 11, "name": "Iron mines", "tier": 1, "target": "1x to 2", "done": false, "cost": 720, "rr": 600, "re": 10, "scale": true, "cp": 1, "pop": 5, "opt": false}, {"r": 12, "name": "Even growth", "tier": 1, "target": "1x of all to 2", "done": false, "cost": null, "rr": 300, "re": 5, "scale": true, "cp": null, "pop": null, "opt": false}, {"r": 13, "name": "Granary", "tier": 1, "target": "to 1", "done": false, "cost": 270, "rr": 300, "re": 5, "scale": true, "cp": 1, "pop": 1, "opt": false}, {"r": 14, "name": "Warehouse", "tier": 1, "target": "to 1", "done": false, "cost": 420, "rr": 300, "re": 5, "scale": true, "cp": 1, "pop": 1, "opt": false}, {"r": 15, "name": "Main Building", "tier": 2, "target": "to 3", "done": false, "cost": 555, "rr": 1200, "re": 20, "scale": true, "cp": 1, "pop": 2, "opt": false}, {"r": 16, "name": "Granary", "tier": 2, "target": "to 3", "done": false, "cost": 790, "rr": 600, "re": 10, "scale": true, "cp": 1, "pop": 2, "opt": false}, {"r": 17, "name": "Marketplace", "tier": 1, "target": "to 1", "done": false, "cost": 340, "rr": 600, "re": 10, "scale": true, "cp": 4, "pop": 4, "opt": false}, {"r": 18, "name": "Marketplace", "tier": 2, "target": "to 3", "done": false, "cost": 990, "rr": 1200, "re": 20, "scale": true, "cp": 1, "pop": 4, "opt": false}, {"r": 19, "name": "All croplands", "tier": 1, "target": "all to 2", "done": false, "cost": 3325, "rr": 900, "re": 15, "scale": true, "cp": 5, "pop": 0, "opt": false}, {"r": 20, "name": "Embassy", "tier": 1, "target": "to 1", "done": false, "cost": 540, "rr": 1200, "re": 20, "scale": true, "cp": 5, "pop": 3, "opt": false}, {"r": 21, "name": "Cranny", "tier": 1, "target": "to 1", "done": false, "cost": 130, "rr": 300, "re": 5, "scale": true, "cp": 1, "pop": 0, "opt": false}, {"r": 22, "name": "Cranny", "tier": 2, "target": "to 3", "done": false, "cost": 380, "rr": 600, "re": 10, "scale": true, "cp": 1, "pop": 0, "opt": false}, {"r": 23, "name": "City wall", "tier": 1, "target": "to 1", "done": false, "cost": 400, "rr": 600, "re": 10, "scale": true, "cp": 1, "pop": 0, "opt": false}, {"r": 24, "name": "City wall", "tier": 2, "target": "to 3", "done": false, "cost": 1170, "rr": 1200, "re": 20, "scale": true, "cp": 1, "pop": 0, "opt": false}, {"r": 25, "name": "All woodcutters", "tier": 1, "target": "all to 2", "done": false, "cost": 1995, "rr": 900, "re": 15, "scale": true, "cp": 3, "pop": 9, "opt": false}, {"r": 26, "name": "All clay pits", "tier": 1, "target": "all to 2", "done": false, "cost": 2010, "rr": 900, "re": 15, "scale": true, "cp": 3, "pop": 9, "opt": false}, {"r": 27, "name": "All iron mines", "tier": 1, "target": "all to 2", "done": false, "cost": 2175, "rr": 900, "re": 15, "scale": true, "cp": 3, "pop": 15, "opt": false}, {"r": 28, "name": "Complete economy", "tier": 1, "target": "all res to 2", "done": false, "cost": null, "rr": 2400, "re": 40, "scale": true, "cp": null, "pop": null, "opt": false}, {"r": 29, "name": "Population", "tier": 1, "target": 50, "done": false, "cost": null, "rr": 1500, "re": 25, "scale": true, "cp": null, "pop": null, "opt": false}, {"r": 30, "name": "Warehouse", "tier": 2, "target": "to 3", "done": false, "cost": 1220, "rr": 600, "re": 10, "scale": true, "cp": 1, "pop": 2, "opt": false}, {"r": 31, "name": "Barracs", "tier": 1, "target": "to 1", "done": false, "cost": 730, "rr": 600, "re": 10, "scale": true, "cp": 1, "pop": 4, "opt": false}, {"r": 32, "name": "Woodcutters", "tier": 2, "target": "1x to 4", "done": false, "cost": 1860, "rr": 1200, "re": 20, "scale": true, "cp": 1, "pop": 2, "opt": false}, {"r": 33, "name": "Croplands", "tier": 2, "target": "1x to 4", "done": false, "cost": 1860, "rr": 1200, "re": 20, "scale": true, "cp": 1, "pop": 0, "opt": false}, {"r": 34, "name": "Clay pits", "tier": 2, "target": "1x to 4", "done": false, "cost": 1870, "rr": 1200, "re": 20, "scale": true, "cp": 1, "pop": 2, "opt": false}, {"r": 35, "name": "Iron mines", "tier": 2, "target": "1x to 4", "done": false, "cost": 2015, "rr": 1200, "re": 20, "scale": true, "cp": 1, "pop": 4, "opt": false}, {"r": 36, "name": "Even growth", "tier": 2, "target": "1x of all to 4", "done": false, "cost": null, "rr": 600, "re": 10, "scale": true, "cp": null, "pop": null, "opt": false}, {"r": 37, "name": "Cranny", "tier": 3, "target": "to 6", "done": false, "cost": 1065, "rr": 900, "re": 15, "scale": true, "cp": 1, "pop": 1, "opt": false}, {"r": 38, "name": "Main Building", "tier": 3, "target": "to 7", "done": false, "cost": 2395, "rr": 1800, "re": 30, "scale": true, "cp": 4, "pop": 6, "opt": false}, {"r": 39, "name": "Culture point production", "tier": 1, "target": 50, "done": false, "cost": null, "rr": 1500, "re": 25, "scale": true, "cp": null, "pop": null, "opt": false}, {"r": 40, "name": "Barracs", "tier": 2, "target": "to 3", "done": false, "cost": 2135, "rr": 600, "re": 10, "scale": true, "cp": 1, "pop": 4, "opt": false}, {"r": 41, "name": "Academy", "tier": 1, "target": "to 1", "done": false, "cost": 510, "rr": 600, "re": 10, "scale": true, "cp": 5, "pop": 4, "opt": false}, {"r": 42, "name": "One cropland", "tier": null, "target": "to 3", "done": false, "cost": 695, "rr": null, "re": null, "scale": false, "cp": 1, "pop": 0, "opt": false}, {"r": 43, "name": "Smithy", "tier": 1, "target": "to 1", "done": false, "cost": 1090, "rr": 600, "re": 10, "scale": true, "cp": 2, "pop": 4, "opt": false}, {"r": 44, "name": "All iron mines", "tier": 2, "target": "all to 3", "done": false, "cost": 2265, "rr": 1800, "re": 30, "scale": true, "cp": 3, "pop": 6, "opt": false}, {"r": 45, "name": "Population", "tier": 2, "target": 100, "done": false, "cost": null, "rr": 3000, "re": 50, "scale": true, "cp": null, "pop": null, "opt": false}, {"r": 46, "name": "All croplands", "tier": 2, "target": "all to 3", "done": false, "cost": 2780, "rr": 1800, "re": 30, "scale": true, "cp": 4, "pop": 0, "opt": false}, {"r": 47, "name": "All woodcutters", "tier": 2, "target": "all to 3", "done": false, "cost": 2085, "rr": 1800, "re": 30, "scale": true, "cp": 3, "pop": 3, "opt": false}, {"r": 48, "name": "All clay pits", "tier": 2, "target": "all to 3", "done": false, "cost": 2100, "rr": 1800, "re": 30, "scale": true, "cp": 3, "pop": 3, "opt": false}, {"r": 49, "name": "Residence", "tier": 1, "target": "to 1", "done": false, "cost": 1570, "rr": 1200, "re": 20, "scale": true, "cp": 2, "pop": 1, "opt": false}, {"r": 50, "name": "One cropland", "tier": null, "target": "1x to 4", "done": false, "cost": 1165, "rr": null, "re": null, "scale": false, "cp": 0, "pop": 0, "opt": false}, {"r": 51, "name": "Smithy", "tier": null, "target": "to 3", "done": false, "cost": 2570, "rr": null, "re": null, "scale": false, "cp": 1, "pop": 4, "opt": false}, {"r": 52, "name": "Stable", "tier": 1, "target": "to 1", "done": false, "cost": 720, "rr": 600, "re": 10, "scale": true, "cp": 2, "pop": 5, "opt": false}, {"r": 53, "name": "Academy", "tier": null, "target": "to 5", "done": false, "cost": 3915, "rr": null, "re": null, "scale": false, "cp": 5, "pop": 8, "opt": false}, {"r": 54, "name": "Stable", "tier": 2, "target": "to 3", "done": false, "cost": 2105, "rr": 1200, "re": 20, "scale": true, "cp": 1, "pop": 6, "opt": false}, {"r": 55, "name": "#N/A", "tier": null, "target": "#N/A", "done": false, "cost": null, "rr": null, "re": null, "scale": false, "cp": null, "pop": null, "opt": false}, {"r": 56, "name": "Research", "tier": null, "target": "Clubswinger", "done": false, "cost": 0, "rr": null, "re": null, "scale": false, "cp": null, "pop": null, "opt": false}, {"r": 57, "name": "Farm units", "tier": 10, "target": "to make", "done": false, "cost": 2500, "rr": 2500, "re": 41.666666666666664, "scale": false, "cp": 104.16666666666667, "pop": 52.083333333333336, "opt": false}, {"r": 58, "name": "Complete economy", "tier": 2, "target": "all res to 4", "done": false, "cost": 14280, "rr": 4800, "re": 80, "scale": true, "cp": 0, "pop": 12, "opt": false}, {"r": 59, "name": "All croplands", "tier": 3, "target": "all to 5", "done": false, "cost": 9725, "rr": 2700, "re": 45, "scale": true, "cp": 0, "pop": 0, "opt": false}, {"r": 60, "name": "All clay pits", "tier": 3, "target": "all to 5", "done": false, "cost": 7760, "rr": 2700, "re": 45, "scale": true, "cp": 0, "pop": 4, "opt": false}, {"r": 61, "name": "Population", "tier": 3, "target": 150, "done": false, "cost": null, "rr": 4500, "re": 75, "scale": true, "cp": null, "pop": null, "opt": false}, {"r": 62, "name": "All woodcutters", "tier": 3, "target": "all to 5", "done": false, "cost": 7780, "rr": 2700, "re": 45, "scale": true, "cp": 0, "pop": 4, "opt": false}, {"r": 63, "name": "All iron mines", "tier": 3, "target": "all to 5", "done": false, "cost": 8400, "rr": 2700, "re": 45, "scale": true, "cp": 0, "pop": 8, "opt": false}, {"r": 64, "name": "Croplands", "tier": null, "target": "1 to 7", "done": false, "cost": 8675, "rr": 1800, "re": 30, "scale": true, "cp": 2, "pop": 2, "opt": false}, {"r": 65, "name": "Marketplace", "tier": 3, "target": "to 7", "done": false, "cost": 4290, "rr": 1800, "re": 30, "scale": true, "cp": 6, "pop": 10, "opt": false}, {"r": 66, "name": "Cranny", "tier": 4, "target": "to 10", "done": false, "cost": 3430, "rr": 1200, "re": 20, "scale": false, "cp": 3, "pop": 4, "opt": false}, {"r": 67, "name": "Crannies", "tier": null, "target": "7x to 3", "done": false, "cost": 3570, "rr": null, "re": null, "scale": false, "cp": 14, "pop": 0, "opt": false}, {"r": 68, "name": "Culture point production", "tier": 2, "target": 100, "done": false, "cost": null, "rr": 3000, "re": 50, "scale": true, "cp": null, "pop": null, "opt": false}, {"r": 69, "name": "Farm units", "tier": 10, "target": "to make", "done": false, "cost": 2500, "rr": 2500, "re": 41.666666666666664, "scale": false, "cp": 104.16666666666667, "pop": 52.083333333333336, "opt": false}, {"r": 70, "name": "Main Building", "tier": 4, "target": "to 12", "done": false, "cost": 9310, "rr": 2400, "re": 40, "scale": true, "cp": 11, "pop": 10, "opt": false}, {"r": 71, "name": "Academy", "tier": 2, "target": "to 10", "done": false, "cost": 15250, "rr": 1200, "re": 20, "scale": true, "cp": 15, "pop": 15, "opt": false}, {"r": 72, "name": "Workplace", "tier": null, "target": "to 1", "done": false, "cost": 1895, "rr": 2400, "re": 40, "scale": true, "cp": 4, "pop": 3, "opt": false}, {"r": 73, "name": "Town hall", "tier": 1, "target": "to 1", "done": false, "cost": 4220, "rr": 2400, "re": 40, "scale": true, "cp": 6, "pop": 4, "opt": false}, {"r": 74, "name": "Crannies", "tier": null, "target": "7x to 7", "done": false, "cost": 11445, "rr": null, "re": null, "scale": false, "cp": 14, "pop": 14, "opt": false}, {"r": 75, "name": "Culture point production", "tier": 2, "target": 150, "done": false, "cost": null, "rr": 4500, "re": 75, "scale": true, "cp": null, "pop": null, "opt": false}, {"r": 76, "name": "Embassy", "tier": null, "target": "to 6", "done": false, "cost": 6015, "rr": null, "re": null, "scale": false, "cp": 7, "pop": 10, "opt": false}, {"r": 77, "name": "Marketplace", "tier": 4, "target": "to 12", "done": false, "cost": 16655, "rr": 2400, "re": 40, "scale": true, "cp": 16, "pop": 15, "opt": false}, {"r": 78, "name": "Residence", "tier": null, "target": "to 3", "done": false, "cost": 4585, "rr": 2400, "re": 40, "scale": true, "cp": 1, "pop": 2, "opt": false}, {"r": 79, "name": "Population", "tier": 4, "target": 250, "done": false, "cost": null, "rr": 6000, "re": 100, "scale": true, "cp": null, "pop": null, "opt": false}, {"r": 80, "name": "CP Stuff", "tier": null, "target": null, "done": false, "cost": null, "rr": null, "re": null, "scale": false, "cp": null, "pop": null, "opt": false}, {"r": 81, "name": "Granary", "tier": 3, "target": "to 7", "done": false, "cost": 3415, "rr": 900, "re": 15, "scale": true, "cp": 2, "pop": 4, "opt": false}, {"r": 82, "name": "Warehouse", "tier": 3, "target": "to 7", "done": false, "cost": null, "rr": 900, "re": 15, "scale": true, "cp": null, "pop": null, "opt": false}, {"r": 83, "name": "Residence", "tier": null, "target": "to 7", "done": false, "cost": 19810, "rr": 3600, "re": 60, "scale": true, "cp": 4, "pop": 4, "opt": false}, {"r": 84, "name": "Warehouse", "tier": null, "target": "to 8", "done": false, "cost": 2360, "rr": null, "re": null, "scale": false, "cp": 0, "pop": 1, "opt": false}, {"r": 85, "name": "Party 1", "tier": null, "target": null, "done": false, "cost": 20330, "rr": 2400, "re": 40, "scale": true, "cp": null, "pop": null, "opt": false}, {"r": 86, "name": "CP stuff", "tier": null, "target": null, "done": false, "cost": null, "rr": null, "re": null, "scale": false, "cp": null, "pop": null, "opt": false}, {"r": 87, "name": "Residence", "tier": null, "target": "to 10", "done": false, "cost": 34635, "rr": 4800, "re": 80, "scale": true, "cp": 5, "pop": 3, "opt": false}, {"r": 88, "name": "Train settler(s)", "tier": null, "target": 0, "done": false, "cost": 0, "rr": null, "re": null, "scale": false, "cp": null, "pop": null, "opt": false}, {"r": 89, "name": "Party 3", "tier": null, "target": null, "done": false, "cost": 20330, "rr": null, "re": null, "scale": false, "cp": null, "pop": null, "opt": false}, {"r": 90, "name": "Train settler(s)", "tier": null, "target": 3, "done": false, "cost": 60000, "rr": null, "re": null, "scale": false, "cp": null, "pop": null, "opt": false}, {"r": 91, "name": "Party 4", "tier": null, "target": null, "done": false, "cost": 20330, "rr": null, "re": null, "scale": false, "cp": null, "pop": null, "opt": false}, {"r": 92, "name": "Don't forget about the 3k resc for launching!", "tier": null, "target": null, "done": false, "cost": 3000, "rr": null, "re": null, "scale": false, "cp": null, "pop": null, "opt": false}, {"r": 98, "name": "Embassy", "tier": null, "target": "to 9", "done": false, "cost": 9295, "cp": 9, "pop": 6, "opt": true}, {"r": 99, "name": "Main building", "tier": null, "target": "to 14", "done": false, "cost": 8380, "cp": 8, "pop": 4, "opt": true}, {"r": 100, "name": "Academy", "tier": null, "target": "to 11", "done": false, "cost": 6020, "cp": 5, "pop": 3, "opt": true}, {"r": 101, "name": "Main building", "tier": null, "target": "to 15", "done": false, "cost": 6025, "cp": 5, "pop": 2, "opt": true}, {"r": 102, "name": "Embassy", "tier": null, "target": "to 10", "done": false, "cost": 4985, "cp": 4, "pop": 2, "opt": true}, {"r": 103, "name": "Marketplace", "tier": null, "target": "to 14", "done": false, "cost": 14995, "cp": 12, "pop": 6, "opt": true}, {"r": 104, "name": "Rallypoint", "tier": null, "target": "to 3", "done": false, "cost": 1250, "cp": 1, "pop": 2, "opt": true}, {"r": 105, "name": "Embassy", "tier": null, "target": "to 11", "done": false, "cost": 6375, "cp": 5, "pop": 3, "opt": true}, {"r": 106, "name": "Academy", "tier": null, "target": "to 12", "done": false, "cost": 7710, "cp": 6, "pop": 3, "opt": true}, {"r": 107, "name": "Main building", "tier": null, "target": "to 16", "done": false, "cost": 7710, "cp": 6, "pop": 3, "opt": true}, {"r": 108, "name": "Embassy", "tier": null, "target": "to 12", "done": false, "cost": 8160, "cp": 6, "pop": 3, "opt": true}, {"r": 109, "name": "Culture point production", "tier": 4, "target": 250, "done": false, "cost": null, "cp": null, "pop": null, "rr": 6000, "re": 100, "opt": true}, {"r": 110, "name": "Main Building", "tier": null, "target": "to 18", "done": false, "cost": 22495, "cp": 16, "pop": 6, "opt": true}, {"r": 111, "name": "Academy", "tier": null, "target": "to 13", "done": false, "cost": 9865, "cp": 6, "pop": 3, "opt": true}, {"r": 112, "name": "Cranny sims", "tier": null, "target": "All to 10", "done": false, "cost": 28600, "cp": 20, "pop": 30, "opt": true}]
+;
+const UNITS = {
+  "Equites Imperatoris":{tribe:"Roman",cost:1410,research:8780,cap:100,upkeep:3},
+  "Legionnaire":{tribe:"Roman",cost:400,research:0,cap:50,upkeep:1},
+  "Theutates Thunders":{tribe:"Gaul",cost:1090,research:6660,cap:75,upkeep:2},
+  "Phalanx":{tribe:"Gaul",cost:315,research:0,cap:35,upkeep:1},
+  "Clubswinger":{tribe:"Teuton",cost:250,research:0,cap:60,upkeep:1}
+};
+const SETTLER = {Gaul:18100,Roman:19000,Teuton:20000};
+const WINDOWS = [[120,132,"~120(+) h"],[105,120,"105–120 h"],[95,105,"95–105 h"],[80,95,"under 95 h"]];
+const PHASES = [
+  {from:6,to:10,title:"Opening moves",tip:"Send your hero on the shortest adventure to get a horse, then smash animals!\nActivate the 25% resource production bonus."},
+  {from:11,to:24,title:"Hero build & first buildings",tip:"Put points in strength based on the oases you can raid — 0 oases: max 2 points · 1–5 oases: 8/12 points · 6+ oases: 12(+) points. Use rewards to level your hero back to full health after smashing animals; put the rest into resource production. You're unlikely to use your hero for 24 h straight, so extra production points keep income flowing once no oasis is clearable."},
+  {from:25,to:30,title:"All fields to level 2",tip:"Raid oases until you'd need to walk 1 h+ to one you're sure you can clear. After that, consider adventure 2 (resource bounty) — it gives about 2,300 resources."},
+  {from:31,to:37,title:"Barracks & fields to level 4",tip:"Keep raiding oases until walking time hits 2 h+, then consider moving almost all hero points into resource production with the Book of Wisdom. The book drops from adventure 6, usually within 24 h of starting."},
+  {from:38,to:57,title:"Farming setup",tip:"How many farm units to make is hard to call — base it on how nearby oases actually play out. Recommended: 10–20 cavalry or 30–60 infantry. Timing matters too: oases only produce once all animals are killed, so starting farm units straight away isn't recommended. Equites Imperatoris aren't recommended — expensive and hard to make more profitable than Legionnaires."},
+  {from:58,to:69,title:"Economy to level 5",tip:"Iron mine ROI isn't great: with a level 6–8 hero it's around 81 h (reward included), for about +75/h production with the 25% bonus. Weigh that against your farming numbers — more farm units later may be the better buy."},
+  {from:70,to:84,title:"CP push",tip:"The critical phase where you need to think for yourself. A fast, farming-heavy start means less CP produced so far, which has to be made up with more CP from parties. Work out your own situation and add CP production here if needed — see the efficient CP buildings at the bottom."},
+  {from:85,to:92,title:"Parties & settling",tip:"Adjust the number of settlers if you have other plans — costs follow the tribe you selected above."},
+  {from:98,to:112,title:"Optional · efficient CP per resource",opt:true,tip:"If you went really fast (good spawn, or bossing it yourself) you may run short on CP, since speeding up before party 1 leaves less time for CP production to accumulate. These are the cheapest CP-per-resource buildings.\nPro tip: with spare income, upgrading the town hall shortens party duration so you get a party's CP sooner. A party already in queue won't be shortened by a TH upgrade, and CP upgrades made while a party is queued apply when the next party starts."}
+];
+
+let S = {done:{}, tribe:"Teuton", unit:"Clubswinger", hero:0, n57:10, n69:10, n88:0, n90:3, start:"", farm:"0"};
+TASKS.forEach(t=>{ if(t.done) S.done[t.r]=true; });
+
+const fmt = n => n==null||n===""?"":Math.round(n).toLocaleString("en-US");
+const $ = id => document.getElementById(id);
+
+function resolve(t){
+  const u = UNITS[S.unit], ei = S.unit==="Equites Imperatoris";
+  const m = 1 + (S.hero*2)/100;
+  let e = {name:t.name, target:t.target, tier:t.tier, cost:t.cost||0, rr:(t.rr||0), re:(t.re||0), cp:t.cp||0, pop:t.pop||0, skip:false, input:null, note:""};
+  if(t.scale){ e.rr*=m; e.re*=m; } else if(!t.opt && t.rr){ /* hard-coded reward */ }
+  if(t.opt && !t.name.startsWith("Culture")){ e.rr=0; e.re=0; e.note = fmt(t.cost/t.cp)+" res per CP"; }
+  if(t.opt && t.name.startsWith("Culture")){ e.rr*=m; e.re*=m; }
+  switch(t.r){
+    case 54: e.target = ei?"to 5":"to 3"; e.cost = ei?5550:2105; e.cp = ei?3:1; e.pop = ei?12:6; break;
+    case 55: if(ei){ e.name="Warehouse"; e.target="to 5"; e.cost=2010; e.cp=0; e.pop=2; } else { e.name="Warehouse to 5"; e.target="—"; e.skip=true; e.note="Only needed for Equites Imperatoris"; } break;
+    case 56: e.cp=0; e.pop=0; e.name="Research"; e.target=S.unit; e.cost=u.research; e.rr=0; e.re=0; if(!u.research) e.note="No research needed"; break;
+    case 57: case 69: { const n=S["n"+t.r]; e.name="Farm units"; e.target=S.unit; e.cp=0; e.pop=0; e.tier=null; e.cost=u.cost*n; e.rr=0; e.re=0; e.input="n"+t.r;
+      e.note=`${n} × ${fmt(u.cost)} · ${(n*u.cap).toLocaleString()} carry/raid · ${fmt(e.cost/24)}/h to break even in 24 h`; break; }
+    case 82: e.cost = ei?3285:5295; e.cp=2; e.pop = ei?2:4; break;
+    case 88: case 90: { const n=S["n"+t.r]; e.target="settlers"; e.cost=SETTLER[S.tribe]*n; e.input="n"+t.r; e.note=`${n} × ${fmt(SETTLER[S.tribe])} (${S.tribe})`; break; }
+    case 80: case 86: e.note="Add CP buildings if you're short — see the optional list at the bottom"; break;
+    case 92: e.name="Keep 3,000 resources for launching"; break;
+  }
+  if(typeof e.target==="number") e.target = e.name.startsWith("Population")? e.target+" pop" : e.target+" CP/day";
+  return e;
+}
+
+function compute(){
+  let bal = 3000, prevR = 0, out=[];
+  TASKS.forEach(t=>{
+    const e = resolve(t);
+    if(!t.opt && !e.skip){ bal = bal + prevR - e.cost; prevR = e.rr; }
+    if(t.opt){ bal = bal - e.cost; }
+    e.bal = e.skip? null : bal;
+    e.t = t; out.push(e);
+  });
+  return out;
+}
+
+function phaseOf(r){ return PHASES.find(p=>r>=p.from && r<=p.to); }
+
+function render(){
+  const rows = compute();
+  const main = rows.filter(e=>!e.t.opt && !e.skip);
+  const done = main.filter(e=>S.done[e.t.r]);
+  const pct = main.length? Math.round(done.length/main.length*100):0;
+  $("pct").textContent = pct+"%";
+  $("countTxt").textContent = `${done.length} of ${main.length} tasks done`;
+  $("mainBar").style.width = pct+"%";
+  const nx = main.find(e=>!S.done[e.t.r]);
+  $("nextTask").innerHTML = nx ? `<span class="eyebrow">Up next</span><br><b>${nx.name}</b> ${nx.target? "· "+nx.target:""}${nx.cost? ` · costs <span class="num">${fmt(nx.cost)}</span>`:""}${nx.rr? ` · reward <span class="num">${fmt(nx.rr)}</span>`:""}` : `<b>All main tasks done — time to settle!</b>`;
+
+  $("phaseBars").innerHTML = PHASES.filter(p=>!p.opt).map(p=>{
+    const ps = main.filter(e=>e.t.r>=p.from&&e.t.r<=p.to), d = ps.filter(e=>S.done[e.t.r]).length;
+    const w = ps.length? d/ps.length*100:0;
+    return `<div class="pb"><span>${p.title}</span><div class="bar"><i style="width:${w}%"></i></div><span class="num muted" style="text-align:right">${d}/${ps.length}</span></div>`;
+  }).join("");
+
+  // totals
+  const all = rows.filter(e=>!e.skip);
+  const doneAll = all.filter(e=>S.done[e.t.r]);
+  const sum = (a,k)=>a.reduce((s,e)=>s+(e[k]||0),0);
+  const cpNow = sum(doneAll,"cp"), cpPlan = sum(main,"cp");
+  const popNow = sum(doneAll,"pop"), expNow = sum(doneAll,"re");
+  const spent = sum(doneAll,"cost"), earned = sum(doneAll,"rr");
+  const remaining = main.filter(e=>!S.done[e.t.r]);
+  const netLeft = sum(remaining,"cost") - sum(remaining,"rr");
+  const u = UNITS[S.unit];
+  const troopsDone = [57,69].filter(r=>S.done[r]).reduce((s,r)=>s+S["n"+r],0);
+  const troopsPlan = S.n57 + S.n69;
+  const cropNow = troopsDone*u.upkeep, cropPlan = troopsPlan*u.upkeep;
+
+  $("stats").innerHTML = [
+    ["Resources spent", fmt(spent)], ["Task rewards collected", fmt(earned)],
+    ["Still to produce / farm", fmt(Math.max(0,netLeft))], ["Hero exp from tasks", fmt(expNow)],
+    ["Population from plan", fmt(popNow)], ["Farm units made", troopsDone+" "+S.unit], ["Optional CP buildings", rows.filter(e=>e.t.opt&&S.done[e.t.r]&&e.cp).length+" / "+rows.filter(e=>e.t.opt&&e.cp).length], ["Settlers planned", (S.n88+S.n90)]
+  ].map(([k,v])=>`<div class="stat"><span class="v">${v}</span><span class="k">${k}</span></div>`).join("");
+
+  // compare
+  const f5 = [59,60,62,63].every(r=>S.done[r]), c7 = !!S.done[64];
+  const chip = (ok,txt,mid)=>`<span class="chip ${ok?"ok":mid?"warn":"bad"}">${txt}</span>`;
+  const cpChip = cpNow>=230? chip(true,"met") : cpPlan+sum(rows.filter(e=>e.t.opt&&S.done[e.t.r]),"cp")>=230? chip(false,"on plan",true) : chip(false,"plan short",false);
+  const fieldsDone = [59,60,62,63].filter(r=>S.done[r]).length;
+  const optCp = sum(rows.filter(e=>e.t.opt&&S.done[e.t.r]),"cp");
+  const w = WINDOWS[+S.farm];
+  $("compare").innerHTML = `
+    <div class="crow"><span class="lbl">CP production</span><span class="val num">${cpNow} / ~230+</span>${cpChip}
+      <span class="sub">This plan's buildings give ${cpPlan}${optCp?` + ${optCp} from optional CP buildings`:""}. Close the gap to ~230 with “CP stuff” and the efficient CP list.</span></div>
+    <div class="crow"><span class="lbl">Resource fields</span><span class="val">${f5?"All lv5":fieldsDone+"/4 types at lv5"}${c7?" · crop 7":""}</span>${chip(f5&&c7, f5&&c7?"met":"in progress", !(f5&&c7))}
+      <span class="sub">Target: all fields lv5 and 1 cropland at lv7.</span></div>
+    <div class="crow"><span class="lbl">Troop crop use</span><span class="val num">${cropNow} / ~50+</span>${chip(cropNow>=50, cropNow>=50?"met":cropPlan>=50?"on plan":"plan short", cropPlan>=50)}
+      <span class="sub">${troopsPlan} ${S.unit} planned × ${u.upkeep} crop each = ${cropPlan}/h. The guide suggests 10–20 cavalry or 30–60 infantry.</span></div>
+    <div class="crow"><span class="lbl">Expected settle time</span><span class="val">${w[2]}</span>${chip(true,"day-1 "+$("farm").selectedOptions[0].text,true)}
+      <span class="sub">Based on the day-1 farm bracket you selected above.</span></div>`;
+
+  // timeline
+  const max=160, L = x=>Math.min(100,x/max*100);
+  $("win").style.left = L(w[0])+"%"; $("win").style.width = (L(w[1])-L(w[0]))+"%";
+  $("tprog").style.width = L(w[1]*pct/100)+"%";
+  if(S.start){
+    const hrs = (Date.now()-new Date(S.start).getTime())/36e5;
+    $("now").hidden=false; $("now").style.left = L(Math.max(0,hrs))+"%";
+    const eta = h=>new Date(new Date(S.start).getTime()+h*36e5).toLocaleString(undefined,{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+    let pace = hrs<=0? "" : (pct/100) >= hrs/w[1] ? " · ahead of pace" : " · behind pace";
+    $("timeTxt").textContent = `${Math.max(0,hrs).toFixed(1)} h elapsed · settle between ${eta(w[0])} and ${eta(w[1])}${pace}`;
+  } else { $("now").hidden=true; $("timeTxt").textContent = "Set your start time to see elapsed hours and your settle date window"; }
+
+  // phases
+  $("phases").innerHTML = PHASES.map(p=>{
+    const ps = rows.filter(e=>e.t.r>=p.from&&e.t.r<=p.to);
+    const act = ps.filter(e=>!e.skip), d = act.filter(e=>S.done[e.t.r]).length;
+    return `<section class="phase"><div class="phase-head"><h2>${p.title}</h2><span class="num muted">${d} / ${act.length} done</span></div>
+      <div class="tip"><b>Tip</b>${p.tip}</div>
+      <div class="list" role="list"><div class="row head"><span></span><span>Task</span><span>Tier</span><span>Target</span><span class="r">Cost</span><span class="r">Reward</span><span class="r">CP</span><span class="r">${p.opt?"Res / CP":"Balance"}</span></div>
+      ${ps.map(e=>{
+        const r=e.t.r, isD=!!S.done[r];
+        const tgt = e.input? `<input type="number" id="${e.input}" data-k="${e.input}" min="0" max="999" value="${S[e.input]}" aria-label="Amount">` : (e.target??"");
+        const last = p.opt? (e.cp? fmt(e.cost/e.cp):"") : (e.bal==null?"":fmt(e.bal));
+        return `<div class="row task ${isD?"done":""} ${e.skip?"skip":""}" role="listitem" data-r="${r}">
+          <input type="checkbox" id="c${r}" data-r="${r}" ${isD?"checked":""} ${e.skip?"disabled":""} aria-label="${e.name} done">
+          <label class="tname" for="c${r}">${e.name}${e.note?`<small>${e.note}</small>`:""}</label>
+          <span>${e.tier?`<span class="tier">T${e.tier}</span>`:""}</span>
+          <span>${tgt}</span>
+          <span class="r num">${e.cost?fmt(e.cost):""}</span>
+          <span class="r num">${e.rr?fmt(e.rr):""}</span>
+          <span class="r num">${e.cp?"+"+e.cp:""}</span>
+          <span class="r num ${!p.opt&&e.bal<0?"neg":""}">${last}</span></div>`;
+      }).join("")}</div></section>`;
+  }).join("");
+}
+
+// ---- persistence: per-viewer private doc, localStorage fallback ----
+let docRef=null, saveTimer=null;
+const LS="t46-3p-farming";
+function setSave(t){ $("saveState").textContent=t; }
+function queueSave(){
+  clearTimeout(saveTimer); setSave("Saving…");
+  saveTimer=setTimeout(async()=>{
+    try{ localStorage.setItem(LS, JSON.stringify(S)); }catch(e){}
+    if(docRef){ try{ await docRef.set({state:JSON.stringify(S), at:Date.now()}); setSave("Saved to your account"); }catch(e){ setSave("Saved in this browser only"); } }
+    else setSave("Saved in this browser");
+  },500);
+}
+function applyState(o){ if(o&&typeof o==="object"){ S=Object.assign(S,o); S.done=o.done||{}; } syncControls(); render(); }
+function syncControls(){
+  $("tribe").value=S.tribe;
+  $("unit").innerHTML = Object.keys(UNITS).filter(k=>UNITS[k].tribe===S.tribe).map(k=>`<option>${k}</option>`).join("");
+  if(UNITS[S.unit].tribe!==S.tribe) S.unit=Object.keys(UNITS).find(k=>UNITS[k].tribe===S.tribe);
+  $("unit").value=S.unit; $("hero").value=S.hero; $("start").value=S.start||""; $("farm").value=S.farm;
+}
+async function boot(){
+  try{ const raw=localStorage.getItem(LS); if(raw) applyState(JSON.parse(raw)); else {syncControls(); render();} }catch(e){ syncControls(); render(); }
+  setSave("Saved in this browser");
+  try{
+    if(!window.claude?.use) return;
+    const [db,user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    const uid = user? await user.id() : null;
+    if(!db||!uid) return;
+    docRef = db.doc("data/users/"+uid+"/progress");
+    const snap = await docRef.get();
+    if(snap.exists){ try{ applyState(JSON.parse(snap.data().state)); }catch(e){} }
+    setSave("Synced to your account");
+  }catch(e){}
+}
+
+document.addEventListener("change",ev=>{
+  const el=ev.target;
+  if(el.matches('input[type=checkbox][data-r]')){ const r=el.dataset.r; if(el.checked) S.done[r]=true; else delete S.done[r]; render(); queueSave(); return; }
+  if(el.dataset.k){ S[el.dataset.k]=Math.max(0,parseInt(el.value)||0); render(); queueSave(); return; }
+  if(el.id==="tribe"){ S.tribe=el.value; syncControls(); }
+  if(el.id==="unit") S.unit=el.value;
+  if(el.id==="hero") S.hero=Math.max(0,parseInt(el.value)||0);
+  if(el.id==="start") S.start=el.value;
+  if(el.id==="farm") S.farm=el.value;
+  if(["tribe","unit","hero","start","farm"].includes(el.id)){ render(); queueSave(); }
+});
+document.addEventListener("click",ev=>{
+  const row=ev.target.closest(".row.task");
+  if(row && !ev.target.closest("input,label")){ const cb=row.querySelector("input[type=checkbox]"); if(cb&&!cb.disabled){ cb.checked=!cb.checked; cb.dispatchEvent(new Event("change",{bubbles:true})); } }
+});
+$("reset").onclick=()=>{ $("resetConfirm").hidden=false; };
+$("resetNo").onclick=()=>{ $("resetConfirm").hidden=true; };
+$("resetYes").onclick=()=>{ S.done={}; $("resetConfirm").hidden=true; render(); queueSave(); };
+setInterval(()=>{ if(S.start) render(); }, 60000);
+boot();
+</script>
+
+</body></html>
